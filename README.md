@@ -1,4 +1,4 @@
-extreme-fusion-demo
+eXtreme-Fusion 5
 ===================
 
-Demo page for eXtreme-Fusion 5
+Demo page for our new system
