@@ -103,7 +103,6 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		(9, 'admin.panels', 'panels.png', 'Panels', 'panels.php', 3),
 		(10, 'admin.panels', 'panels.png', 'Panel Editor', 'panel_editor.php', 3),
 		(11, 'admin.permissions', 'permissions.png', 'Permissions', 'permissions.php', 2),
-		(12, 'admin.phpinfo', 'phpinfo.png', 'PHP Info', 'phpinfo.php', 3),
 		(13, 'admin.security', 'security.png', 'Security Politics', 'settings_security.php', 4),
 		(14, 'admin.settings', 'settings.png', 'Main', 'settings_main.php', 4),
 		(15, 'admin.settings_banners', 'settings_banners.png', 'Banners', 'settings_banners.php', 4),
