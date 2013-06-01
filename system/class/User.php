@@ -746,7 +746,7 @@ class User {
 				{
 					$this->_data = $query;
 
-					$hash = $this->createLoginHash();
+					$hash = '123456';//$this->createLoginHash();
 					$time = time();
 
 					// Zapis sesji
@@ -815,10 +815,10 @@ class User {
 				//echo 'db: '.$row['user_hash'].'<br />'.$hash; exit;
 				if ($row['user_hash'] === $hash)
 				{
-					$_crypt = new Crypt(CRYPT_KEY, CRYPT_IV);
+					//$_crypt = new Crypt(CRYPT_KEY, CRYPT_IV);
 
-					if ($_crypt->decrypt($row['browser_info']) === md5($_SERVER['HTTP_USER_AGENT']))
-					{
+					//if ($_crypt->decrypt($row['browser_info']) === md5($_SERVER['HTTP_USER_AGENT']))
+					//{
 						// Obliczanie wyjściowego czasu, by móc ocenić, czy sesja jest prawidłowa.
 						if ($row['user_remember_me'])
 						{
@@ -854,7 +854,7 @@ class User {
 							HELP::removeCookie('user');
 							$this->setGuestOnline();
 						}
-					}
+					//}
 				}
 			}
 		}
@@ -891,7 +891,7 @@ class User {
 
 						if ($row['user_last_logged_in'] > $session_start_time)
 						{
-							$hash = $this->createLoginHash();
+							$hash = '123456';//$this->createLoginHash();
 
 							// Aktualizacja danych autoryzacji w bazie danych
 							$this->_pdo->exec('UPDATE [users] SET `user_hash` = \''.$hash.'\' WHERE `id` = '.$row['id']);
@@ -1257,7 +1257,7 @@ class User {
 
 				if ($row)
 				{
-					$hash = $this->createLoginHash();
+					$hash = '123456';//$this->createLoginHash();
 
 					$_SESSION['admin'] = array(
 						'id'	 => $row['id'],
@@ -1293,15 +1293,15 @@ class User {
 			{
 				if ($row['admin_hash'] === $hash)
 				{
-					$_crypt = new Crypt(CRYPT_KEY, CRYPT_IV);
+					//$_crypt = new Crypt(CRYPT_KEY, CRYPT_IV);
 
-					if ($_crypt->decrypt($row['browser_info']) === md5($_SERVER['HTTP_USER_AGENT']))
-					{
+					//if ($_crypt->decrypt($row['browser_info']) === md5($_SERVER['HTTP_USER_AGENT']))
+					//{
 						if ($row['admin_last_logged_in'] > (time()-$this->_sett->getUns('loging', 'admin_loging_time')))
 						{
 							$this->_data = $row;
 
-							$hash = $this->createLoginHash();
+							$hash = '123456';//$this->createLoginHash();
 
 							$_SESSION['admin']['hash'] = $hash;
 
@@ -1312,7 +1312,7 @@ class User {
 
 							return TRUE;
 						}
-					}
+					//}
 				}
 			}
 		}

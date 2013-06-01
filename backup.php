@@ -530,7 +530,7 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		('userthemes', '1'),
 		('user_custom_offset_timezone', '0'),
 		('validation', 'a:1:{s:8:\"register\";s:1:\"0\";}'),
-		('version', '5.0.1-unstable'),
+		('version', '5'),
 		('visits_counter_enabled', '1');
 	");
 	
