@@ -54,10 +54,10 @@ try
 			'bad_words_enabled' => $_request->post('bad_words_enabled')->isNum(TRUE),
 			'bad_words' => $_request->post('bad_words')->strip(),
 			'bad_word_replace' => $_request->post('bad_word_replace')->strip(),
-			'maintenance_level' => $_request->post('maintenance_level')->getNumArray() ? HELP::implode($_request->post('maintenance_level')->show()) : $_sett->get('maintenance_level'),
-			'maintenance' => $_request->post('maintenance')->isNum(TRUE),
-			'maintenance_form' => $_request->post('maintenance_form')->isNum(TRUE),
-			'maintenance_message' => $_request->post('maintenance_message')->show()
+			//'maintenance_level' => $_request->post('maintenance_level')->getNumArray() ? HELP::implode($_request->post('maintenance_level')->show()) : $_sett->get('maintenance_level'),
+			//'maintenance' => $_request->post('maintenance')->isNum(TRUE),
+			//'maintenance_form' => $_request->post('maintenance_form')->isNum(TRUE),
+			//'maintenance_message' => $_request->post('maintenance_message')->show()
 		));
 
 		$_tpl->printMessage('valid', $_log->insertSuccess('edit', __('Data has been saved.')));
