@@ -647,10 +647,6 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		PRIMARY KEY (`user_id`)
 	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=2 ;");
 	
-	$query = $_pdo->exec("INSERT INTO [users_data] (`user_id`, `name`, `old`, `gg`, `skype`, `www`, `location`, `sig`) VALUES
-		(1, '', '', '', '', '', '', '');
-	");
-	
 	$query = $_pdo->exec("CREATE TABLE IF NOT EXISTS [users_online] (
 		`user_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
 		`ip` varchar(20) NOT NULL DEFAULT '0.0.0.0',
