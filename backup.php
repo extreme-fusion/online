@@ -62,7 +62,10 @@ require_once DIR_SYSTEM.'helpers/main.php';
 	
 	foreach($table as $val)
 	{	
-		$query = $_pdo->exec('DROP TABLE IF EXISTS '.$val);
+		if ($val !== 'online_statistics')
+		{
+			$query = $_pdo->exec('DROP TABLE IF EXISTS '.$val);
+		}
 	}
 
 	$_files->rmDirRecursive(DIR_UPLOAD);
@@ -518,7 +521,7 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		('site_banner1', ''),
 		('site_banner2', ''),
 		('site_intro', '<div style=\"text-align:center\">EN: Welcome to the website with demo version of eXtreme-Fusion 5: Ninja Edition</div>\r\n<div style=\"text-align:center\">PL: Witaj na stronie z wersją demo eXtreme-Fusion 5: Ninja Edition</div>\r\n<div style=\"text-align:center\">CZ: Vítejte na stránkách s demoverzí eXtreme-Fusion 5: Ninja Edition</div>'),
-		('site_name', 'DEMO:: eXtreme-Fusion 5 - Ninja Edition'),
+		('site_name', 'eXtreme-Fusion 5 - Ninja Edition'),
 		('site_username', 'admin'),
 		('smtp_host', ''),
 		('smtp_password', ''),
