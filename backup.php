@@ -20,6 +20,7 @@ require DIR_BASE.'config.php';
 require DIR_SITE.'bootstrap.php';
 require_once DIR_CLASS.'Exception.php';
 require_once DIR_SYSTEM.'helpers/main.php';
+define('VERSION', '5.0.1');
 
 	$_locale = new Locales('English', DIR_LOCALE);
 
@@ -521,7 +522,7 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		('site_banner1', ''),
 		('site_banner2', ''),
 		('site_intro', '<div style=\"text-align:center\">EN: Welcome to the website with demo version of eXtreme-Fusion 5: Ninja Edition</div>\r\n<div style=\"text-align:center\">PL: Witaj na stronie z wersją demo eXtreme-Fusion 5: Ninja Edition</div>\r\n<div style=\"text-align:center\">CZ: Vítejte na stránkách s demoverzí eXtreme-Fusion 5: Ninja Edition</div>'),
-		('site_name', 'eXtreme-Fusion 5 - Ninja Edition'),
+		('site_name', 'eXtreme-Fusion ".VERSION." - Ninja Edition'),
 		('site_username', 'admin'),
 		('smtp_host', ''),
 		('smtp_password', ''),
@@ -533,7 +534,7 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		('userthemes', '1'),
 		('user_custom_offset_timezone', '0'),
 		('validation', 'a:1:{s:8:\"register\";s:1:\"0\";}'),
-		('version', '5'),
+		('version', '".VERSION."'),
 		('visits_counter_enabled', '1');
 	");
 	
