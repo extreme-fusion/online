@@ -489,6 +489,7 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		('deactivation_period', '365'),
 		('deactivation_response', '14'),
 		('default_search', 'all'),
+		('demo_last_reset', '".time()."'),
 		('description', ''),
 		('email_verification', '1'),
 		('enable_deactivation', '0'),
