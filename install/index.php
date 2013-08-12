@@ -13,7 +13,7 @@
 | at www.gnu.org/licenses/agpl.html. Removal of this
 | copyright header is strictly prohibited without
 | written permission from the original author(s).
-| 
+|
 **********************************************************
                 ORIGINALLY BASED ON
 ---------------------------------------------------------+
@@ -35,9 +35,6 @@ error_reporting(-1);
 
 try
 {
-	// Instalowana wersja systemu - wyświetlana w nagłówku nawigacji
-	define('VERSION', '5.0.1-unstable');
-
 	$HostURL = explode('install', $_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
 
 	$charset = 'utf8';
@@ -59,6 +56,7 @@ try
 	$_tpl = new optClass;
 	$_tpl->compile = DIR_CACHE;
 	$_tpl->root = DIR_BASE.'templates'.DS;
+	$_tpl->setCompilePrefix('install_');
 	/***/
 
 	require DIR_SITE.'system'.DS.'helpers'.DS.'main.php';
@@ -116,11 +114,13 @@ try
 			} elseif (getStepNum() === 3) {
 				$header = __('Step 3: File and Folder Permissions Test');
 			} elseif (getStepNum() === 4) {
-				$header = __('Step 4: Database Settings');
+				$header = __('Step 4: Database settings');
 			} elseif (getStepNum() === 5) {
-				$header = __('Step 5: Head Admin Details');
+				$header = __('Step 5: Admin account');
 			} elseif (getStepNum() === 6) {
-				$header = __('Step 6: Final Settings');
+				$header = __('Step 6: System settings');
+			} elseif (getStepNum() === 7) {
+				$header = __('Step 7: Final settings');
 			} else {
 				$header = '';
 			}
@@ -172,9 +172,10 @@ try
 				explode(':', __('Step 1: Locale')),
 				explode(':', __('Step 2: Checking server configuration')),
 				explode(':', __('Step 3: File and Folder Permissions Test')),
-				explode(':', __('Step 4: Database Settings')),
-				explode(':', __('Step 5: Head Admin Details')),
-				explode(':', __('Step 6: Final Settings'))
+				explode(':', __('Step 4: Database settings')),
+				explode(':', __('Step 5: Admin account')),
+				explode(':', __('Step 6: System settings')),
+				explode(':', __('Step 7: Final settings'))
 			);
 
 			$data = array(); $i = 0;
@@ -246,12 +247,12 @@ try
 	}
 
 	$_tpl->assignGroup(array(
-		'title' => __('eXtreme-Fusion :version - Setup', array(':version' => VERSION)),
+		'title' => __('eXtreme-Fusion :version - Setup', array(':version' => SYSTEM_VERSION)),
 		'charset' => __('Charset'),
 		'ADDR_ADMIN' => ADDR_SITE.'admin/',
 		'ADDR_SITE' => ADDR_SITE,
 		'ADDR_INSTALL' =>  ADDR_SITE.'install/',
-		'step_header' => __('eXtreme-Fusion :version - Setup', array(':version' => VERSION)).(getStepHeader() ? ' &raquo; '.getStepHeader() : ''),
+		'step_header' => __('eXtreme-Fusion :version - Setup', array(':version' => SYSTEM_VERSION)).(getStepHeader() ? ' » '.getStepHeader() : ''),
 		'step_menu' => getStepMenu(),
 		'step' => getStepNum(),
 		'php_required' => PHP_REQUIRED
@@ -421,15 +422,15 @@ try
 			$db_host = isset($_POST['db_host']) ? trim($_POST['db_host']) : '';
 			// todo: sprawdzanie czy numeryczny
 			$db_port = isset($_POST['db_port']) ? trim($_POST['db_port']) : '';
-			
+
 			$db_user = isset($_POST['db_user']) ? trim($_POST['db_user']) : '';
 			$db_pass = isset($_POST['db_pass']) ? trim($_POST['db_pass']) : '';
 			$db_name = isset($_POST['db_name']) ? trim($_POST['db_name']) : '';
-			
+
 			$db_prefix = isset($_POST['db_prefix']) ? trim(HELP::strip($_POST['db_prefix'])) : '';
 			$cookie_prefix = isset($_POST['cookie_prefix']) ? trim(HELP::strip($_POST['cookie_prefix'])) : '';
 			$cache_prefix = isset($_POST['cache_prefix']) ? trim(HELP::strip($_POST['cache_prefix'])) : '';
-			
+
 			// todo: filtrowanie aresu do strony
 			$site_url = isset($_POST['site_url']) ? $_POST['site_url'] : '';
 
@@ -452,7 +453,7 @@ try
 			}
 
 			$success = FALSE;
-			
+
 			// db_prefix jest opcjonalny!
 			if ($db_host !== '' && $db_user !== '' && $db_name !== '' && $db_port !== '' && $site_url !== '')
 			{
@@ -461,10 +462,10 @@ try
 					$_pdo = new Data('mysql:host='.$db_host.';dbname='.$db_name.';port='.$db_port, $db_user, $db_pass, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES '.$charset));
 					$_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
 					$_pdo->config($db_prefix);
-					
+
 					// For php < 5.3.1: http://stackoverflow.com/a/4348744/1794927
 					$_pdo->query('SET NAMES '.$charset, NULL, FALSE);
-				
+
 					if (!$d = $_pdo->query("SHOW TABLES LIKE '$db_prefix%'"))
 					{
 						$table_name = $db_prefix.substr(strrev(time()), 0, 5);
@@ -633,17 +634,13 @@ try
 			if (!$error)
 			{
 				require DIR_SITE.'config.php';
-				if (file_exists(DIR_SITE.'cache'.DS))
-				{
-					$_system->clearCache(NULL, array(), DIR_SITE.'cache'.DS);
-				}
 
 				$_pdo = new Data('mysql:host='.$_dbconfig['host'].';dbname='.$_dbconfig['database'].';port='.$_dbconfig['port'], $_dbconfig['user'], $_dbconfig['password'], array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES '.$_dbconfig['charset']));
 				$_pdo->config($_dbconfig['prefix']);
-				
+
 				// For php < 5.3.1: http://stackoverflow.com/a/4348744/1794927
 				$_pdo->query('SET NAMES '.$_dbconfig['charset'], NULL, FALSE);
-				
+
 				$localeset = $_SESSION['localeset'];
 				include 'create_settings.php';
 
@@ -678,12 +675,52 @@ try
 	}
 	else if (getStepNum() === 6)
 	{
+		$_locale->setSubDir('admin');
+		$_locale->load('settings_synchro');
+
+		$loaded = FALSE;
+		if (function_exists('curl_init'))
+		{
+			$loaded = TRUE;
+		}
+		elseif (function_exists('fsockopen'))
+		{
+			$loaded = TRUE;
+		}
+		elseif (function_exists('fopen'))
+		{
+			$loaded = TRUE;
+		}
+
+		$_tpl->assign('synchro_available', $loaded);
+
+		if ($_POST)
+		{
+			if (isset($_POST['synchro']) && $_POST['synchro'] && $loaded)
+			{
+				require DIR_SITE.'config.php';
+
+				$_pdo = new Data('mysql:host='.$_dbconfig['host'].';dbname='.$_dbconfig['database'].';port='.$_dbconfig['port'], $_dbconfig['user'], $_dbconfig['password'], array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES '.$_dbconfig['charset']));
+				$_pdo->config($_dbconfig['prefix']);
+
+				// For php < 5.3.1: http://stackoverflow.com/a/4348744/1794927
+				$_pdo->query('SET NAMES '.$_dbconfig['charset'], NULL, FALSE);
+
+				$_pdo->exec('UPDATE [settings] SET `value` = 1 WHERE `key` = \'synchro\'');
+			}
+			goToStep(7);
+		}
+	}
+	else if (getStepNum() === 7)
+	{
 		if ($_POST)
 		{
 			restartInstall();
 			goToPage();
 		}
 
+		$_files = new Files;
+		$_files->rmDirRecursive(DIR_SITE.'cache'.DS, TRUE);
 	}
 
 	$_tpl->parse('index.tpl');
@@ -702,5 +739,5 @@ catch(userException $exception)
 }
 catch(PDOException $exception)
 {
-   echo $exception;
+   PDOErrorHandler($exception);
 }

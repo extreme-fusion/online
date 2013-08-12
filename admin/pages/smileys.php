@@ -44,11 +44,13 @@ try
         throw new userException(__('Access denied'));
     }
 
+	$_fav->setFavByLink('smileys.php', $_user->get('id'));
+
 	$_tpl = new Iframe;
 
 	if ($_request->get(array('status', 'act'))->show())
 	{
-		// Wyœwietli komunikat
+		// WyÅ›wietli komunikat
 		$_tpl->getMessage($_request->get('status')->show(), $_request->get('act')->show(), 
 			array(
 				'add' => array(
@@ -71,6 +73,7 @@ try
 
 		if ($count)
 		{
+			$_system->clearCacheRecursive($_files);
 			$_log->insertSuccess('delete', __('Smiley has been deleted.'));
 			$_request->redirect(FILE_PATH, array('act' => 'delete', 'status' => 'ok'));
 		}
@@ -97,6 +100,7 @@ try
 	
 			if ($count)
 			{
+				$_system->clearCacheRecursive($_files);
 				$_log->insertSuccess('edit', __('Smiley has been edited.'));
 				$_request->redirect(FILE_PATH, array('act' => 'edit', 'status' => 'ok'));
 			}
@@ -116,6 +120,7 @@ try
 
 			if ($count)
 			{
+				$_system->clearCacheRecursive($_files);
 				$_log->insertSuccess('add', __('Smiley has been added.'));
 				$_request->redirect(FILE_PATH, array('act' => 'add', 'status' => 'ok'));
 			}

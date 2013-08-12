@@ -13,7 +13,6 @@
 | at www.gnu.org/licenses/agpl.html. Removal of this
 | copyright header is strictly prohibited without
 | written permission from the original author(s).
-|
 **********************************************************
                 ORIGINALLY BASED ON
 ---------------------------------------------------------+
@@ -32,6 +31,16 @@
 | written permission from the original author(s).
 +--------------------------------------------------------*/
 $_locale->load('news_cats');
+
+/*
+ * To do
+ * Przekazać nagłówki do systemu
+ * $theme = array(
+		'Title' => '',
+		'Keys' => '',
+		'Desc' => ''
+	);
+ */
 
 // Ładowanie styli z szablonu
 $_head->set($_tpl->getHeaders());

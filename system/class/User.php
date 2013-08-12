@@ -31,6 +31,9 @@ class User {
 	// Tablica zawierająca dane zalogowanego użytkownika
 	protected $_data = array();
 
+	// Tablica z danymi użytkowników
+	protected $_users = array();
+
 	// Czy użytkownik jest zalogowany?
 	protected $_logged = FALSE;
 
@@ -56,6 +59,12 @@ class User {
 	protected $_ip_v4;
 
 	protected $_custom_data;
+	
+	// Przechowuje zaserializowane ustawienia
+	protected $_cache = array();
+	
+	protected $_system;
+
 
 	/**
 	 * Czas ważności ciasteczka.
@@ -108,10 +117,11 @@ class User {
 	 * @param   Database  klasa bazy danych
 	 * @return  void
 	 */
-	public function __construct(Sett $sett, Data $pdo)
+	public function __construct(Sett $sett, Data $pdo, System $system)
 	{
 		$this->_sett = $sett;
 		$this->_pdo = $pdo;
+		$this->_system = $system;
 		$this->setAllRolesCache();
 		$this->setPermissionsCache();
 		$this->setPermissionsSectionsCache();
@@ -122,7 +132,8 @@ class User {
 		// Przed edycją należy przeczytać opis przy deklaracji zmiennej
 		$this->_cookie_life_time = time() + 60*60*24*31;
 
-		// From php.net
+		// Author: Karoly Nagy (Korcsii)
+		// https://github.com/php-fusion/PHP-Fusion/blob/master/includes/ip_handling_include.php
 		if (filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP))
 		{
 			if (strpos($_SERVER['REMOTE_ADDR'], '.'))
@@ -507,11 +518,41 @@ class User {
 			}
 			else
 			{
+				$bind = array(':user_id', $id, PDO::PARAM_INT);
+
 				// Zapisuje dane użytkownika o podanym ID
 				$this->_pdo->exec('INSERT INTO [users_data] (`user_id`, `'.$fields['keys'].'`) VALUES (:user_id, :'.$fields['params'].') ON DUPLICATE KEY UPDATE '.$fields['fields'], array_merge(
-					array(array(':user_id', $id, PDO::PARAM_INT)),
+					array($bind),
 					$fields['values']
 				));
+
+				/**
+				 * Nie wszystkie dodatkowe pola podlegają edycji.
+				 * Z tego powodu trzeba pobrać wszystkie pola dla danego użytkownika,
+				 * by sprawdzić, czy posiada w którymś z nich dane.
+				 */
+
+				// Pobiera wszystkie dane dla użytkownika o podanym ID
+				$user_data = $this->_pdo->getRow('SELECT * FROM [users_data] WHERE `user_id` = :user_id', $bind);
+
+				unset($user_data['user_id']);
+
+				$has_data = FALSE;
+				foreach($user_data as $val)
+				{
+					// Sprawdzanie, czy któreś pole posiada dane
+					if (trim($val))
+					{
+						$has_data = TRUE;
+						break;
+					}
+				}
+
+				if (! $has_data)
+				{
+					// Usuwanie zbędnego wiersza
+					$this->_pdo->exec('DELETE FROM [users_data] WHERE `user_id` = :user_id', $bind);
+				}
 			}
 		}
 
@@ -539,11 +580,12 @@ class User {
 			}
 		}
 
+		$this->_system->clearCache('system', 'user_data-'.$id);
 		return TRUE;
 	}
 
 	// Zwraca dodatkowe dane użytkownika z możliwością ich nadpisania przez $values.
-	public function getCustomData($user_id = NULL, array $values = array())
+	public function getCustomData($user_id = NULL, array $values = array(), $edit = NULL)
 	{
 		$query = $this->_pdo->getData('SELECT * FROM [user_field_cats] ORDER BY `order` ASC');
 		$cats = array();
@@ -551,8 +593,17 @@ class User {
 		{
 			$cats[] = $data;
 		}
-
-		$query = $this->_pdo->getData('SELECT * FROM [user_fields]');
+		
+		if ($edit === NULL)
+		{
+			$query = $this->_pdo->getData('SELECT * FROM [user_fields]');
+		}
+		else
+		{
+			$edit = (int) $edit;
+			$query = $this->_pdo->getData('SELECT * FROM [user_fields] WHERE `edit` = '.$edit);
+		}
+		
 		$fields = array();
 		foreach($query as $data)
 		{
@@ -572,11 +623,13 @@ class User {
 			$_new_fields = array();
 			foreach($cats as $key => $cat)
 			{
-				$i = 0;
+				$i = 0; $has_field = FALSE;
 				foreach($fields as $field)
 				{
 					if ($field['cat'] === $cat['id'])
 					{
+						$has_field = TRUE;
+						
 						$new_fields[$key][$i] = $field;
 
 						$new_fields[$key][$i]['value'] = '';
@@ -602,6 +655,11 @@ class User {
 
 						$i++;
 					}
+				}
+				
+				if (! $has_field)
+				{
+					unset($cats[$key]);
 				}
 			}
 		}
@@ -691,13 +749,22 @@ class User {
 
 		if ($this->isValidLogin($username))
 		{
-			if ($query = $this->_pdo->getRow("SELECT `id`, `status`, `salt`, `password` FROM [users] WHERE `username`='{$username}' AND status = 0 LIMIT 1"))
+			if ($query = $this->_pdo->getRow("SELECT `id`, `status`, `salt`, `password` , `algo` FROM [users] WHERE `username`='{$username}' AND status = 0 LIMIT 1"))
 			{
-				$sha512 = sha512($query['salt'].'^'.$pass);
+				$hash = $query['algo'] === 'sha512' ? sha512($query['salt'].'^'.$pass) : md5(md5($pass));
 
 				// Sprawdzanie poprawności hasła
-				if ($sha512 === $query['password'])
-				{
+				if ($hash === $query['password'])
+				{	
+				
+					if($query['algo'] === 'md5')
+					{
+						if ($this->changePass($query['id'], $pass))
+						{
+							$this->_pdo->exec('UPDATE [users] SET `algo` = \'sha512\' WHERE `id` = '.$query['id']);
+						}
+					}
+					
 					$this->_data = $query;
 
 					$hash = $this->createLoginHash();
@@ -955,7 +1022,9 @@ class User {
 	{
 		if ( ! $data = $this->get('salt', $id))
 		{
-			return FALSE;
+			$data = substr(sha512(uniqid(rand(), true)), 0, 5);
+			$this->_pdo->exec('UPDATE [users] SET `salt` = \''.$data.'\' WHERE `id` = '.$id);
+			return sha512($data.'^'.$pass);
 		}
 		return sha512($data.'^'.$pass);
 	}
@@ -1020,7 +1089,21 @@ class User {
 	{
 		if (isNum($id))
 		{
-			$data = $this->_pdo->getRow('SELECT u.*, ud.* FROM [users] u LEFT JOIN [users_data] ud ON u.`id`= ud.`user_id` WHERE u.`id` = '.$id);
+			if (isset($this->_users[$id]))
+			{
+				$data = $this->_users[$id];
+			}
+			else
+			{
+				$this->_cache = $this->_system->cache('user_data-'.$id, NULL, 'system');
+				if ($this->_cache === NULL)
+				{
+					$this->_cache = $this->_pdo->getRow('SELECT u.*, ud.* FROM [users] u LEFT JOIN [users_data] ud ON u.`id`= ud.`user_id` WHERE u.`id` = '.$id);
+			
+					$this->_system->cache('user_data-'.$id, $this->_cache, 'system');
+				}
+				$data = $this->_users[$id] = $this->_cache;
+			}
 
 			if ($data)
 			{
@@ -1537,12 +1620,20 @@ class User {
 	 */
 	protected function setAllRolesCache()
 	{
-		$query = $this->_pdo->getData('SELECT * FROM [groups]');
-		foreach($query as $role)
+		$this->_cache = $this->_system->cache('groups', NULL, 'system');
+		if ($this->_cache === NULL)
 		{
-			$role['permissions'] = unserialize($role['permissions']);
-			$this->_all_roles[$role['id']] = $role;
+			$query = $this->_pdo->getData('SELECT * FROM [groups]');
+			foreach($query as $role)
+			{
+				$role['permissions'] = unserialize($role['permissions']);
+				$this->_cache[$role['id']] = $role;
+			}
+	
+			$this->_system->cache('groups', $this->_cache, 'system');
 		}
+
+		$this->_all_roles = $this->_cache;
 	}
 
 	/**
@@ -1553,12 +1644,19 @@ class User {
 	 */
 	protected function setPermissionsCache()
 	{
-		$r = $this->_pdo->query('SELECT * FROM [permissions]');
-
-		foreach($r as $d)
+		$this->_cache = $this->_system->cache('permissions', NULL, 'system');
+		if ($this->_cache === NULL)
 		{
-			$this->_perms[] = $d;
+			$query = $this->_pdo->getData('SELECT * FROM [permissions]');
+			foreach($query as $d)
+			{
+				$this->_cache[] = $d;
+			}
+	
+			$this->_system->cache('permissions', $this->_cache, 'system');
 		}
+
+		$this->_perms = $this->_cache;
 	}
 
 	/**
@@ -1569,12 +1667,19 @@ class User {
 	 */
 	protected function setPermissionsSectionsCache()
 	{
-		$r = $this->_pdo->query('SELECT * FROM [permissions_sections]');
-
-		foreach($r as $d)
+		$this->_cache = $this->_system->cache('permissions_sections', NULL, 'system');
+		if ($this->_cache === NULL)
 		{
-			$this->_perms_sections[] = $d;
+			$query = $this->_pdo->getData('SELECT * FROM [permissions_sections]');
+			foreach($query as $d)
+			{
+				$this->_cache[] = $d;
+			}
+	
+			$this->_system->cache('permissions_sections', $this->_cache, 'system');
 		}
+
+		$this->_perms_sections = $this->_cache;
 	}
 
 	/**
@@ -2003,7 +2108,8 @@ class User {
 		return TRUE;
 	}
 
-	// From php.net
+	// Author: Karoly Nagy (Korcsii)
+	// https://github.com/php-fusion/PHP-Fusion/blob/master/includes/ip_handling_include.php
 	private function IPv6($ip, $limit)
 	{
 		if (strpos($ip, "::") !== FALSE)
@@ -2016,14 +2122,16 @@ class User {
 		}
 		return implode(":", $tmp);
 	}
-
+	
+	// Author: Karoly Nagy (Korcsii)
+	// https://github.com/php-fusion/PHP-Fusion/blob/master/includes/ip_handling_include.php
 	public function bannedByIP()
 	{
 		if ($this->_ip)
 		{
 			if ($this->_ip_type === 4)
 			{
-				return $this->_pdo->getMatchRowsCount('SELECT `id` FROM [blacklist] WHERE type=4 AND ip REGEXP "^'.str_replace(".", ".(", $this->_ip, $i).str_repeat(")?", $i).'$"');
+				return $this->_pdo->getMatchRowsCount('SELECT `id` FROM [blacklist] WHERE type=4 AND ip REGEXP "^'.str_replace(".", "(.", $this->_ip, $i).str_repeat(")?", $i).'$"');
 			}
 			elseif($this->_ip_type === 5)
 			{
@@ -2031,7 +2139,7 @@ class User {
 			}
 			elseif($this->_ip_type === 6)
 			{
-				return $this->_pdo->getMatchRowsCount('SELECT `id` FROM [blacklist] WHERE type=6 AND ip REGEXP "^'.str_replace(":", ":(", $this->_ip, $i).str_repeat(")?", $i).'$"');
+				return $this->_pdo->getMatchRowsCount('SELECT `id` FROM [blacklist] WHERE type=6 AND ip REGEXP "^'.str_replace(":", "(:", $this->_ip, $i).str_repeat(")?", $i).'$"');
 			}
 			else
 			{

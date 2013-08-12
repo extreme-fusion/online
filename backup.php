@@ -19,6 +19,7 @@ define('DIR_BASE', realpath(dirname(__FILE__).DIRECTORY_SEPARATOR).DIRECTORY_SEP
 require DIR_BASE.'config.php';
 require DIR_SITE.'bootstrap.php';
 require_once DIR_CLASS.'Exception.php';
+require_once OPT_DIR.'opt.class.php';
 require_once DIR_SYSTEM.'helpers/main.php';
 
 	$_locale = new Locales('English', DIR_LOCALE);
@@ -40,40 +41,51 @@ require_once DIR_SYSTEM.'helpers/main.php';
 	$_files = $ec->files;
 	
 	$_system->clearCache();
+	$_system->clearCache('cookies');
+	$_system->clearCache('navigation_panel');
 	$_system->clearCache('news');
+	$_system->clearCache('profiles');
 	$_system->clearCache('statistics');
+	$_system->clearCache('synchro');
 	$_system->clearCache('system');
+	$_system->clearCache('users');
 
-	$query = $_pdo->exec('DROP TABLE [admin]');
-	$query = $_pdo->exec('DROP TABLE [bbcodes]');
-	$query = $_pdo->exec('DROP TABLE [blacklist]');
-	$query = $_pdo->exec('DROP TABLE [comments]');
-	$query = $_pdo->exec('DROP TABLE [groups]');
-	$query = $_pdo->exec('DROP TABLE [links]');
-	$query = $_pdo->exec('DROP TABLE [logs]');
-	$query = $_pdo->exec('DROP TABLE [messages]');
-	$query = $_pdo->exec('DROP TABLE [modules]');
-	$query = $_pdo->exec('DROP TABLE [navigation]');
-	$query = $_pdo->exec('DROP TABLE [news]');
-	$query = $_pdo->exec('DROP TABLE [news_cats]');
-	$query = $_pdo->exec('DROP TABLE [notes]');
-	$query = $_pdo->exec('DROP TABLE [pages]');
-	$query = $_pdo->exec('DROP TABLE [pages_categories]');
-	$query = $_pdo->exec('DROP TABLE [pages_custom_settings]');
-	$query = $_pdo->exec('DROP TABLE [pages_types]');
-	$query = $_pdo->exec('DROP TABLE [panels]');
-	$query = $_pdo->exec('DROP TABLE [permissions]');
-	$query = $_pdo->exec('DROP TABLE [permissions_sections]');
-	$query = $_pdo->exec('DROP TABLE [settings]');
-	$query = $_pdo->exec('DROP TABLE [smileys]');
-	$query = $_pdo->exec('DROP TABLE [statistics]');
-	$query = $_pdo->exec('DROP TABLE [tags]');
-	$query = $_pdo->exec('DROP TABLE [time_formats]');
-	$query = $_pdo->exec('DROP TABLE [users]');
-	$query = $_pdo->exec('DROP TABLE [users_data]');
-	$query = $_pdo->exec('DROP TABLE [users_online]');
-	$query = $_pdo->exec('DROP TABLE [user_fields]');
-	$query = $_pdo->exec('DROP TABLE [user_field_cats]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [admin_favourites]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [users]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [admin]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [bbcodes]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [boards]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [board_categories]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [blacklist]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [comments]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [cookies]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [entries]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [groups]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [links]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [logs]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [messages]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [modules]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [navigation]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [news]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [news_cats]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [notes]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [pages]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [pages_categories]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [pages_custom_settings]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [pages_types]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [panels]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [permissions]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [permissions_sections]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [settings]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [smileys]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [statistics]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [tags]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [threads]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [time_formats]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [users_data]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [users_online]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [user_fields]');
+	$query = $_pdo->exec('DROP TABLE IF EXISTS [user_field_cats]');
 	
 	$_files->rmDirRecursive(DIR_UPLOAD);
 	
@@ -82,13 +94,13 @@ require_once DIR_SYSTEM.'helpers/main.php';
 	
 	// REINSTALL
 	$query = $_pdo->exec("CREATE TABLE IF NOT EXISTS [admin] (
-		`id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
-		`permissions` varchar(127) NOT NULL DEFAULT '',
-		`image` varchar(120) NOT NULL DEFAULT '',
-		`title` varchar(50) NOT NULL DEFAULT '',
-		`link` varchar(100) NOT NULL DEFAULT 'reserved',
-		`page` tinyint(3) unsigned NOT NULL DEFAULT '1',
-		PRIMARY KEY (`id`)
+	  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+	  `permissions` varchar(127) NOT NULL DEFAULT '',
+	  `image` varchar(120) NOT NULL DEFAULT '',
+	  `title` varchar(50) NOT NULL DEFAULT '',
+	  `link` varchar(100) NOT NULL DEFAULT 'reserved',
+	  `page` tinyint(3) unsigned NOT NULL DEFAULT '1',
+	  PRIMARY KEY (`id`)
 	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=31 ;");
 	
 	$query = $_pdo->exec("INSERT INTO [admin] (`id`, `permissions`, `image`, `title`, `link`, `page`) VALUES
@@ -96,31 +108,72 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		(2, 'admin.blacklist', 'blacklist.png', 'Blacklist', 'blacklist.php', 2),
 		(3, 'admin.comments', 'comments.png', 'Comments', 'comments.php', 2),
 		(4, 'admin.groups', 'groups.png', 'Groups', 'groups.php', 2),
-		(5, 'admin.pages', 'pages.png', 'Pages', 'pages.php', 1),
+		(5, 'admin.pages', 'pages.png', 'Content Pages', 'pages.php', 1),
 		(6, 'admin.logs', 'logs.png', 'Logs', 'logs.php', 2),
 		(7, 'admin.urls', 'urls.png', 'URLs Generator', 'urls.php', 3),
 		(8, 'admin.news', 'news.png', 'News', 'news.php', 1),
 		(9, 'admin.panels', 'panels.png', 'Panels', 'panels.php', 3),
-		(10, 'admin.panels', 'panels.png', 'Panel Editor', 'panel_editor.php', 3),
-		(11, 'admin.permissions', 'permissions.png', 'Permissions', 'permissions.php', 2),
-		(13, 'admin.security', 'security.png', 'Security Politics', 'settings_security.php', 4),
-		(14, 'admin.settings', 'settings.png', 'Main', 'settings_main.php', 4),
-		(15, 'admin.settings_banners', 'settings_banners.png', 'Banners', 'settings_banners.php', 4),
-		(16, 'admin.settings_cache', 'settings_cache.png', 'Cache', 'settings_cache.php', 4),
-		(17, 'admin.settings_time', 'settings_time.png', 'Time and Date', 'settings_time.php', 4),
-		(18, 'admin.settings_registration', 'registration.png', 'Registration', 'settings_registration.php', 4),
-		(19, 'admin.settings_misc', 'settings_misc.png', 'Miscellaneous', 'settings_misc.php', 4),
-		(20, 'admin.settings_users', 'settings_users.png', 'User Management', 'settings_users.php', 4),
-		(21, 'admin.settings_ipp', 'settings_ipp.png', 'Item per Page', 'settings_ipp.php', 4),
-		(22, 'admin.settings_logs', 'logs.png', 'Logs', 'settings_logs.php', 4),
-		(23, 'admin.settings_login', 'login.png', 'Login', 'settings_login.php', 4),
+		(10, 'admin.permissions', 'permissions.png', 'Permissions', 'permissions.php', 2),
+		(11, 'admin.phpinfo', 'phpinfo.png', 'PHP Info', 'phpinfo.php', 3),
+		(12, 'admin.security', 'security.png', 'Security Politics', 'settings_security.php', 4),
+		(13, 'admin.settings', 'settings.png', 'General', 'settings_general.php', 4),
+		(14, 'admin.settings_banners', 'settings_banners.png', 'Banners', 'settings_banners.php', 4),
+		(15, 'admin.settings_cache', 'settings_cache.png', 'Cache', 'settings_cache.php', 4),
+		(16, 'admin.settings_time', 'settings_time.png', 'Time and Date', 'settings_time.php', 4),
+		(17, 'admin.settings_registration', 'registration.png', 'Registration', 'settings_registration.php', 4),
+		(18, 'admin.settings_misc', 'settings_misc.png', 'Miscellaneous', 'settings_misc.php', 4),
+		(19, 'admin.settings_users', 'settings_users.png', 'User Management', 'settings_users.php', 4),
+		(20, 'admin.settings_ipp', 'settings_ipp.png', 'Item per Page', 'settings_ipp.php', 4),
+		(21, 'admin.settings_logs', 'logs.png', 'Logs', 'settings_logs.php', 4),
+		(22, 'admin.settings_login', 'login.png', 'Login', 'settings_login.php', 4),
+		(23, 'admin.settings_synchro', 'synchro.png', 'Synchronization', 'settings_synchro.php', 4),
 		(24, 'admin.settings_routing', 'router.png', 'Router', 'settings_routing.php', 4),
 		(25, 'admin.navigations', 'navigations.png', 'Site Links', 'navigations.php', 3),
 		(26, 'admin.smileys', 'smileys.png', 'Smileys', 'smileys.php', 3),
-		(27, 'admin.upgrade', 'upgrade.png', 'Upgrade', 'upgrade.php', 3),
-		(28, 'admin.user_fields', 'user_fields.png', 'User Fields', 'user_fields.php', 2),
-		(29, 'admin.user_fields_cats', 'user_fields_cats.png', 'User Field Categories', 'user_field_cats.php', 2),
-		(30, 'admin.users', 'users.png', 'Users', 'users.php', 2);
+		(27, 'admin.user_fields', 'user_fields.png', 'User Fields', 'user_fields.php', 2),
+		(28, 'admin.user_fields_cats', 'user_fields_cats.png', 'User Field Categories', 'user_field_cats.php', 2),
+		(29, 'admin.users', 'users.png', 'Users', 'users.php', 2),
+		(30, 'module.cookies.admin', 'cookies/templates/images/cookies.png', 'Pliki cookies', 'cookies/admin/cookies.php', 5);
+	");
+	
+	$query = $_pdo->exec("CREATE TABLE IF NOT EXISTS [users] (
+	  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+	  `username` varchar(30) NOT NULL DEFAULT '',
+	  `password` char(129) NOT NULL DEFAULT '',
+	  `salt` char(5) NOT NULL DEFAULT '',
+	  `algo` varchar(10) NOT NULL DEFAULT 'sha512',
+	  `user_hash` varchar(10) NOT NULL DEFAULT '',
+	  `user_last_logged_in` int(10) unsigned NOT NULL DEFAULT '0',
+	  `user_remember_me` tinyint(3) unsigned NOT NULL DEFAULT '0',
+	  `admin_hash` varchar(10) NOT NULL DEFAULT '',
+	  `admin_last_logged_in` int(10) unsigned NOT NULL DEFAULT '0',
+	  `browser_info` varchar(100) NOT NULL DEFAULT '',
+	  `link` varchar(30) NOT NULL DEFAULT '',
+	  `email` varchar(100) NOT NULL DEFAULT '',
+	  `hide_email` tinyint(3) unsigned NOT NULL DEFAULT '1',
+	  `valid_code` varchar(32) NOT NULL DEFAULT '',
+	  `valid` tinyint(4) NOT NULL DEFAULT '0',
+	  `offset` char(5) NOT NULL DEFAULT '0',
+	  `avatar` varchar(100) NOT NULL DEFAULT '',
+	  `joined` int(10) unsigned NOT NULL DEFAULT '0',
+	  `lastvisit` int(10) unsigned NOT NULL DEFAULT '0',
+	  `datestamp` int(10) unsigned NOT NULL DEFAULT '0',
+	  `ip` varchar(20) NOT NULL DEFAULT '0.0.0.0',
+	  `status` tinyint(3) unsigned NOT NULL DEFAULT '0',
+	  `actiontime` int(10) unsigned NOT NULL DEFAULT '0',
+	  `theme` varchar(100) NOT NULL DEFAULT 'Default',
+	  `roles` text NOT NULL,
+	  `role` int(11) NOT NULL DEFAULT '2',
+	  `lastupdate` int(11) NOT NULL DEFAULT '0',
+	  `lang` varchar(20) NOT NULL,
+	  PRIMARY KEY (`id`),
+	  KEY `username` (`username`),
+	  KEY `joined` (`joined`),
+	  KEY `lastvisit` (`lastvisit`)
+	) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;");
+	
+	$query = $_pdo->exec("INSERT INTO [users] (`id`, `username`, `password`, `salt`, `algo`, `user_hash`, `user_last_logged_in`, `user_remember_me`, `admin_hash`, `admin_last_logged_in`, `browser_info`, `link`, `email`, `hide_email`, `valid_code`, `valid`, `offset`, `avatar`, `joined`, `lastvisit`, `datestamp`, `ip`, `status`, `actiontime`, `theme`, `roles`, `role`, `lastupdate`, `lang`) VALUES
+		(1, 'Admin', 'd82c1e3cf6d63d3efc55e849da6a54cd4ac997f95ae99a32cd25abd6a879105abe56487a79f9ab39a0671d785f2d98ed52898fa00271934d71bb901619e9a335', '66292', 'sha512', '2da1606a', ".time().", 0, 'b1f79b8f', ".time().", '', 'admin', 'admin@extreme-fusion.org', 1, '', 1, '0', '', ".time().", ".time().", 0, '0.0.0.0', 0, 0, 'Default', 'a:3:{i:0;i:1;i:1;i:2;i:2;i:3;}', 1, 0, 'English');
 	");
 	
 	$query = $_pdo->exec("CREATE TABLE IF NOT EXISTS [bbcodes] (
@@ -156,19 +209,67 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		KEY `type` (`type`)
 	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=1 ;");
 	
-	$query = $_pdo->exec("CREATE TABLE IF NOT EXISTS [comments] (
-		`id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
-		`content_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
-		`content_type` varchar(20) NOT NULL DEFAULT '',
-		`author` varchar(50) NOT NULL DEFAULT '',
-		`author_type` varchar(1) NOT NULL DEFAULT '',
-		`post` text NOT NULL,
-		`datestamp` int(10) unsigned NOT NULL DEFAULT '0',
-		`ip` varchar(20) NOT NULL DEFAULT '0.0.0.0',
+	$query = $_pdo->exec("CREATE TABLE IF NOT EXISTS [boards] (
+	  `id` int(11) NOT NULL AUTO_INCREMENT,
+	  `title` varchar(255) NOT NULL,
+	  `order` int(10) NOT NULL,
+	  PRIMARY KEY (`id`)
+	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=2 ;");
+	
+	$query = $_pdo->exec("INSERT INTO [boards] (`id`, `title`, `order`) VALUES
+		(1, 'Testowy dział', 1);
+	");
+	
+	$query = $_pdo->exec("CREATE TABLE IF NOT EXISTS [board_categories] (
+	  `id` int(11) NOT NULL AUTO_INCREMENT,
+	  `board_id` int(11) NOT NULL,
+	  `title` varchar(255) NOT NULL,
+	  `description` text,
+	  `is_locked` tinyint(1) NOT NULL DEFAULT '0',
+	  `order` int(10) NOT NULL,
+	  PRIMARY KEY (`id`)
+	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=2 ;");
+	
+	$query = $_pdo->exec("INSERT INTO [board_categories] (`id`, `board_id`, `title`, `description`, `is_locked`, `order`) VALUES
+		(1, 1, 'Kategoria', 'Forum dyskusyjne dzieli się na działy, natomiast działy na kategorie.', 0, 1);
+	");
+	
+	$query = $_pdo->exec("CREATE TABLE [comments] (
+		`id` MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
+		`content_id` MEDIUMINT UNSIGNED NOT NULL DEFAULT '0',
+		`content_type` VARCHAR(20) NOT NULL DEFAULT '',
+		`author` VARCHAR(50) NOT NULL DEFAULT '',
+		`author_type` VARCHAR(1) NOT NULL DEFAULT '',
+		`post` TEXT NOT NULL,
+		`datestamp` INT UNSIGNED NOT NULL DEFAULT '0',
+		`ip` VARCHAR(20) NOT NULL DEFAULT '0.0.0.0',
 		PRIMARY KEY (`id`),
 		KEY `datestamp` (`datestamp`)
-	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=1 ;");
+	) ENGINE = InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=1 ;");
 	
+	$query = $_pdo->exec("CREATE TABLE IF NOT EXISTS [cookies] (
+	  `message` varchar(255) NOT NULL,
+	  `policy` text NOT NULL
+	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate.";");
+	
+	$query = $_pdo->exec("INSERT INTO [cookies] (`message`, `policy`) VALUES
+		('Strona ta korzysta z plików cookies w celu zapewnienia lepszej jakości usług.', '');
+	");
+	
+	$query = $_pdo->exec("CREATE TABLE IF NOT EXISTS [entries] (
+	  `id` int(11) NOT NULL AUTO_INCREMENT,
+	  `thread_id` int(11) NOT NULL,
+	  `user_id` int(11) NOT NULL,
+	  `content` text NOT NULL,
+	  `is_main` tinyint(1) NOT NULL DEFAULT '0',
+	  `timestamp` int(10) NOT NULL,
+	  PRIMARY KEY (`id`)
+	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=2 ;");
+	
+	$query = $_pdo->exec("INSERT INTO [entries] (`id`, `thread_id`, `user_id`, `content`, `is_main`, `timestamp`) VALUES
+		(1, 1, 1, 'CZ: Toto je test příspěvek ve vaší fóru.\r\n\r\nEN: This is a test post in your forum.\r\n\r\nPL: Jest to testowy post na Twoim nowym forum.', 1, 1376321849);
+	");
+
 	$query = $_pdo->exec("CREATE TABLE IF NOT EXISTS [groups] (
 		`id` int(11) NOT NULL AUTO_INCREMENT,
 		`title` varchar(127) NOT NULL,
@@ -217,13 +318,18 @@ require_once DIR_SYSTEM.'helpers/main.php';
 	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=1 ;");
 	
 	$query = $_pdo->exec("CREATE TABLE IF NOT EXISTS [modules] (
-		`id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
-		`title` varchar(100) NOT NULL DEFAULT '',
-		`folder` varchar(100) NOT NULL DEFAULT '',
-		`category` varchar(100) NOT NULL DEFAULT '',
-		`version` varchar(10) NOT NULL DEFAULT '0',
-		PRIMARY KEY (`id`)
-	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=1 ;");
+	  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+	  `title` varchar(100) NOT NULL DEFAULT '',
+	  `folder` varchar(100) NOT NULL DEFAULT '',
+	  `category` varchar(100) NOT NULL DEFAULT '',
+	  `version` varchar(10) NOT NULL DEFAULT '0',
+	  PRIMARY KEY (`id`)
+	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=3 ;");
+	
+	$query = $_pdo->exec("INSERT INTO [modules] (`id`, `title`, `folder`, `category`, `version`) VALUES
+		(1, 'Pliki cookies', 'cookies', '', '1.0'),
+		(2, 'Forum', 'forum', '', '1.0');
+	");
 	
 	$query = $_pdo->exec("CREATE TABLE IF NOT EXISTS [navigation] (
 		`id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
@@ -235,7 +341,7 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		`order` smallint(2) unsigned NOT NULL DEFAULT '0',
 		`rewrite` tinyint(3) unsigned NOT NULL DEFAULT '1',
 		PRIMARY KEY (`id`)
-	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=9 ;");
+	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=10 ;");
 	
 	$query = $_pdo->exec("INSERT INTO [navigation] (`id`, `name`, `url`, `visibility`, `position`, `window`, `order`, `rewrite`) VALUES
 		(1, 'Main Page', '', '3', 3, 0, 1, 1),
@@ -246,6 +352,7 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		(6, 'Tags', 'tags.html', '3', 1, 0, 4, 1),
 		(7, 'Pages', 'pages.html', '3', 3, 0, 5, 1),
 		(8, 'Search', 'search.html', '3', 3, 0, 6, 1);
+		(9, 'Forum', 'forum.html', '3', 3, 0, 6, 1);
 	");
 	
 	$query = $_pdo->exec("CREATE TABLE IF NOT EXISTS [news] (
@@ -272,7 +379,7 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		KEY `reads` (`reads`)
 	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=2 ;");
 	
-	$news = '<div style="text-align: center;">\r\n	<img alt="eXtreme-Fusion 5 :: Demo :: EN" src="http://localhost/extreme/demo/templates/images/ef_demo/gb.png" style="width: 66px; height: 83px; float: left;" /></div>\r\n<div style="text-align: center;">\r\n	<em><img alt="eXtreme-Fusion 5 :: DEMO : EN" src="http://localhost/extreme/demo/templates/images/ef_demo/gb.png" style="width: 66px; height: 83px; float: right;" /></em></div>\r\n<div>\r\n	&nbsp;</div>\r\n<div style="text-align: center;">\r\n	<em>You don&#39;t have <a href="http://extreme-fusion.org">eXtreme-Fusion 5: Ninja Edition</a>?</em><br />\r\n	<em>Do you want to get familiar with it before you download it?&nbsp;</em><br />\r\n	<em>We have prepared special demo version of eXtreme-Fusion 5!</em></div>\r\n<div style="text-align: center;">\r\n	&nbsp;</div>\r\n<div style="text-align: center;">\r\n	&nbsp;</div>\r\n<div>\r\n	<span style="color:#ffa500;"><strong>We are giving you a&nbsp;possibility to test the most of system functions!</strong></span><br />\r\n	News writing, adding accounts from Admin Panel, managing of groups permissions, settings, panel system, adding new pages and installing new modules with ability to manage them.</div>\r\n<div>\r\n	&nbsp;</div>\r\n<div>\r\n	<strong><span style="color:#ffa500;">Do you want to see how it looks? Get familiar with system today!</span></strong><br />\r\n	Only thing to do is login using following user data:</div>\r\n<div>\r\n	&nbsp;</div>\r\n<div style="text-align: center;">\r\n	<strong><span style="color:#ffa500;">Username:</span> admin</strong><br />\r\n	<strong><span style="color:#ffa500;">Password:</span> administrator5</strong></div>\r\n<div style="text-align: center;">\r\n	&nbsp;</div>\r\n<div style="text-align: center;">\r\n	&nbsp;</div>\r\n<hr />\r\n<div style="text-align: center;">\r\n	<img alt="eXtreme-Fusion 5 :: Demo :: PL" src="http://localhost/extreme/demo/templates/images/ef_demo/pl.png" style="width: 66px; height: 83px; float: left;" /></div>\r\n<div style="text-align: center;">\r\n	<em><img alt="eXtreme-Fusion 5 :: DEMO : PL" src="http://localhost/extreme/demo/templates/images/ef_demo/pl.png" style="width: 66px; height: 83px; float: right;" /></em></div>\r\n<div>\r\n	<div>\r\n		&nbsp;</div>\r\n	<div style="text-align: center;">\r\n		<em>Nie posiadasz jeszcze <a href="http://extreme-fusion.org">eXtreme-Fusion 5: Ninja Edition</a>?&nbsp;</em><br />\r\n		<em>Przed pobraniem chcesz zapoznać się z&nbsp;systemem?</em><br />\r\n		<em>Przygotowaliśmy dla Ciebie wersję demonstracyjną eXtreme-Fusion 5!</em></div>\r\n	<div style="text-align: center;">\r\n		&nbsp;</div>\r\n	<div style="text-align: center;">\r\n		&nbsp;</div>\r\n	<div>\r\n		<span style="color:#ffa500;"><strong>Dajemy Ci praktycznie wszystkie możliwości sprawdzenia systemu!</strong></span><br />\r\n		Pisanie news&oacute;w, dodawanie kont z&nbsp;poziomu administratora, zarządzanie grupami uprawnień, ustawieniami, układem paneli, dodawanie stron treści oraz instalowanie systemowych moduł&oacute;w i&nbsp;zabawa nimi.</div>\r\n	<div>\r\n		&nbsp;</div>\r\n	<div>\r\n		<strong><span style="color:#ffa500;">Chesz zobaczyć jak to wygląda? Zapoznaj się z&nbsp;systemem już dziś!&nbsp;</span></strong><br />\r\n		Wystarczy tylko, że się zalogujesz korzystając z&nbsp;poniższych danych:</div>\r\n	<div>\r\n		&nbsp;</div>\r\n	<div style="text-align: center;">\r\n		<strong><span style="color:#ffa500;">Nazwa użytkownika:</span> admin</strong><br />\r\n		<strong><span style="color:#ffa500;">Hasło:</span> administrator5</strong></div>\r\n</div>\r\n<div style="text-align: center;">\r\n	&nbsp;</div>\r\n<div style="text-align: center;">\r\n	&nbsp;</div>\r\n<hr />\r\n<div style="text-align: center;">\r\n	<img alt="eXtreme-Fusion 5 :: Demo :: CZ" src="http://localhost/extreme/demo/templates/images/ef_demo/cz.png" style="width: 66px; height: 83px; float: left;" /></div>\r\n<div style="text-align: center;">\r\n	<em><img alt="eXtreme-Fusion 5 :: DEMO : CZ" src="http://localhost/extreme/demo/templates/images/ef_demo/cz.png" style="width: 66px; height: 83px; float: right;" /></em></div>\r\n<div>\r\n	<div>\r\n		&nbsp;</div>\r\n	<div style="text-align: center;">\r\n		<em>Ještě nemáte <a href="http://extreme-fusion.org">eXtreme-Fusion 5: Ninja Edition</a>?&nbsp;</em><br />\r\n		<em>Chcete se s ním seznámit ještě dřív než ho stáhnete?</em><br />\r\n		<em>Připravili jsme speciální demo verzi eXtreme-Fusion 5!</em></div>\r\n	<div style="text-align: center;">\r\n		&nbsp;</div>\r\n	<div style="text-align: center;">\r\n		&nbsp;</div>\r\n	<div>\r\n		<span style="color:#ffa500;"><strong>Dáváme Vám možnost vyzkoušet si většinu funkcí systému!</strong></span><br />\r\n		Psaní novinek, přidávání účtů přes Admin Panel, spravování skupin oprávnění, nastavení či panelů systému, přidávání nových stránek a&nbsp;instalování nových modulů s možností jejich řízení.</div>\r\n	<div>\r\n		&nbsp;</div>\r\n	<div>\r\n		<strong><span style="color:#ffa500;">Chcete vidět jak to všechno vypadá? Seznamte se systémem ještě dnes!</span></strong><br />\r\n		Jediné, co musíte udělat, je přihlásit se pomocí následujících uživatelských údajů:</div>\r\n	<div>\r\n		&nbsp;</div>\r\n	<div style="text-align: center;">\r\n		<strong><span style="color:#ffa500;">Název uživatele:</span> admin</strong><br />\r\n		<strong><span style="color:#ffa500;">Heslo:</span> administrator5</strong></div>\r\n</div>\r\n';
+	$news = '<div style="text-align: center;">\r\n	<img alt="eXtreme-Fusion 5 :: Demo :: EN" src="http://localhost/extreme/demo/templates/images/ef_demo/gb.png" style="width: 66px; height: 83px; float: left;" /></div>\r\n<div style="text-align: center;">\r\n	<em><img alt="eXtreme-Fusion 5 :: DEMO : EN" src="http://localhost/extreme/demo/templates/images/ef_demo/gb.png" style="width: 66px; height: 83px; float: right;" /></em></div>\r\n<div>\r\n	&nbsp;</div>\r\n<div style="text-align: center;">\r\n	<em>You don&#39;t have <a href="http://extreme-fusion.org">eXtreme-Fusion 5: Ninja Edition</a>?</em><br />\r\n	<em>Do you want to get familiar with it before you download it?&nbsp;</em><br />\r\n	<em>We have prepared special demo version of eXtreme-Fusion 5!</em></div>\r\n<div style="text-align: center;">\r\n	&nbsp;</div>\r\n<div style="text-align: center;">\r\n	&nbsp;</div>\r\n<div>\r\n	<span style="color:#ffa500;"><strong>We are giving you a&nbsp;possibility to test the most of system functions!</strong></span><br />\r\n	News writing, adding accounts from Admin Panel, managing of groups permissions, settings, panel system, adding new pages and installing new modules with ability to manage them.</div>\r\n<div>\r\n	&nbsp;</div>\r\n<div>\r\n	<strong><span style="color:#ffa500;">Do you want to see how it looks? Get familiar with system today!</span></strong><br />\r\n	Only thing to do is login using following user data:</div>\r\n<div>\r\n	&nbsp;</div>\r\n<div style="text-align: center;">\r\n	<strong><span style="color:#ffa500;">Username:</span> Admin</strong><br />\r\n	<strong><span style="color:#ffa500;">Password:</span> administrator5</strong></div>\r\n<div style="text-align: center;">\r\n	&nbsp;</div>\r\n<div style="text-align: center;">\r\n	&nbsp;</div>\r\n<hr />\r\n<div style="text-align: center;">\r\n	<img alt="eXtreme-Fusion 5 :: Demo :: PL" src="http://localhost/extreme/demo/templates/images/ef_demo/pl.png" style="width: 66px; height: 83px; float: left;" /></div>\r\n<div style="text-align: center;">\r\n	<em><img alt="eXtreme-Fusion 5 :: DEMO : PL" src="http://localhost/extreme/demo/templates/images/ef_demo/pl.png" style="width: 66px; height: 83px; float: right;" /></em></div>\r\n<div>\r\n	<div>\r\n		&nbsp;</div>\r\n	<div style="text-align: center;">\r\n		<em>Nie posiadasz jeszcze <a href="http://extreme-fusion.org">eXtreme-Fusion 5: Ninja Edition</a>?&nbsp;</em><br />\r\n		<em>Przed pobraniem chcesz zapoznać się z&nbsp;systemem?</em><br />\r\n		<em>Przygotowaliśmy dla Ciebie wersję demonstracyjną eXtreme-Fusion 5!</em></div>\r\n	<div style="text-align: center;">\r\n		&nbsp;</div>\r\n	<div style="text-align: center;">\r\n		&nbsp;</div>\r\n	<div>\r\n		<span style="color:#ffa500;"><strong>Dajemy Ci praktycznie wszystkie możliwości sprawdzenia systemu!</strong></span><br />\r\n		Pisanie news&oacute;w, dodawanie kont z&nbsp;poziomu administratora, zarządzanie grupami uprawnień, ustawieniami, układem paneli, dodawanie stron treści oraz instalowanie systemowych moduł&oacute;w i&nbsp;zabawa nimi.</div>\r\n	<div>\r\n		&nbsp;</div>\r\n	<div>\r\n		<strong><span style="color:#ffa500;">Chesz zobaczyć jak to wygląda? Zapoznaj się z&nbsp;systemem już dziś!&nbsp;</span></strong><br />\r\n		Wystarczy tylko, że się zalogujesz korzystając z&nbsp;poniższych danych:</div>\r\n	<div>\r\n		&nbsp;</div>\r\n	<div style="text-align: center;">\r\n		<strong><span style="color:#ffa500;">Nazwa użytkownika:</span> Admin</strong><br />\r\n		<strong><span style="color:#ffa500;">Hasło:</span> administrator5</strong></div>\r\n</div>\r\n<div style="text-align: center;">\r\n	&nbsp;</div>\r\n<div style="text-align: center;">\r\n	&nbsp;</div>\r\n<hr />\r\n<div style="text-align: center;">\r\n	<img alt="eXtreme-Fusion 5 :: Demo :: CZ" src="http://localhost/extreme/demo/templates/images/ef_demo/cz.png" style="width: 66px; height: 83px; float: left;" /></div>\r\n<div style="text-align: center;">\r\n	<em><img alt="eXtreme-Fusion 5 :: DEMO : CZ" src="http://localhost/extreme/demo/templates/images/ef_demo/cz.png" style="width: 66px; height: 83px; float: right;" /></em></div>\r\n<div>\r\n	<div>\r\n		&nbsp;</div>\r\n	<div style="text-align: center;">\r\n		<em>Ještě nemáte <a href="http://extreme-fusion.org">eXtreme-Fusion 5: Ninja Edition</a>?&nbsp;</em><br />\r\n		<em>Chcete se s ním seznámit ještě dřív než ho stáhnete?</em><br />\r\n		<em>Připravili jsme speciální demo verzi eXtreme-Fusion 5!</em></div>\r\n	<div style="text-align: center;">\r\n		&nbsp;</div>\r\n	<div style="text-align: center;">\r\n		&nbsp;</div>\r\n	<div>\r\n		<span style="color:#ffa500;"><strong>Dáváme Vám možnost vyzkoušet si většinu funkcí systému!</strong></span><br />\r\n		Psaní novinek, přidávání účtů přes Admin Panel, spravování skupin oprávnění, nastavení či panelů systému, přidávání nových stránek a&nbsp;instalování nových modulů s možností jejich řízení.</div>\r\n	<div>\r\n		&nbsp;</div>\r\n	<div>\r\n		<strong><span style="color:#ffa500;">Chcete vidět jak to všechno vypadá? Seznamte se systémem ještě dnes!</span></strong><br />\r\n		Jediné, co musíte udělat, je přihlásit se pomocí následujících uživatelských údajů:</div>\r\n	<div>\r\n		&nbsp;</div>\r\n	<div style="text-align: center;">\r\n		<strong><span style="color:#ffa500;">Název uživatele:</span> Admin</strong><br />\r\n		<strong><span style="color:#ffa500;">Heslo:</span> administrator5</strong></div>\r\n</div>\r\n';
 	
 	$query = $_pdo->exec("INSERT INTO [news] (`id`, `title`, `link`, `category`, `language`, `content`, `content_extended`, `author`, `source`, `description`, `breaks`, `datestamp`, `access`, `reads`, `draft`, `sticky`, `allow_comments`, `allow_ratings`) VALUES
 		(1, 'eXtreme-Fusion 5 :: Demo', 'extreme-fusion_5_demo', 3, 'Polish', '".$news."', '', 1, 'http://extreme-fusion.org', 'EN: This site is a demonstration of Content Management System (CMS) - eXtreme-Fusion 5: Ninja Edition.\r\n\r\nPL: Ta strona jest demonstracją Systemu Zarządzania Treścią (CMS) - eXtreme-Fusion 5: Ninja Edition', '0', 1369995541, '3', 1, 0, 1, 1, 0);");
@@ -407,7 +514,7 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		`is_system` tinyint(1) NOT NULL DEFAULT '0',
 		PRIMARY KEY (`id`),
 		UNIQUE KEY `name` (`name`)
-	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=35 ;");
+	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=37 ;");
 	
 	$query = $_pdo->exec("INSERT INTO [permissions] (`id`, `name`, `section`, `description`, `is_system`) VALUES
 		(1, 'admin.login', 1, 'Logowanie do Panelu Admina.', 1),
@@ -443,7 +550,9 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		(31, 'admin.upgrade', 1, 'Możliwość aktualizowania systemu.', 1),
 		(32, 'admin.user_fields', 1, 'Możliwość dodawania nowych pól użytkownika.', 1),
 		(33, 'admin.user_fields_cats', 1, 'Możliwość dodawania kategorii pól użytkownika.', 1),
-		(34, 'admin.users', 1, 'Możliwość zarządzania kontami użytkowników.', 1);
+		(34, 'admin.users', 1, 'Możliwość zarządzania kontami użytkowników.', 1),
+		(35, 'module.cookies.admin', 3, 'Dostęp do zarządzania modułem Pliki cookies.', 1),
+		(36, 'module.forum.admin', 4, 'Zarządzanie forum dyskusyjnym.', 1);
 	");
 	
 	$query = $_pdo->exec("CREATE TABLE IF NOT EXISTS [permissions_sections] (
@@ -452,11 +561,13 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		`description` varchar(255) NOT NULL,
 		`is_system` tinyint(1) NOT NULL DEFAULT '0',
 		PRIMARY KEY (`id`)
-	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=3 ;");
+	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=5 ;");
 	
 	$query = $_pdo->exec("INSERT INTO [permissions_sections] (`id`, `name`, `description`, `is_system`) VALUES
 		(1, 'admin', 'Administracja', 1),
-		(2, 'site', 'Strona', 1);
+		(2, 'site', 'Strona', 1),
+		(3, 'module.cookies', 'Moduł - Pliki cookies', 1),
+		(4, 'module.forum', 'Moduł - Forum', 1);
 	");
 	
 	$query = $_pdo->exec("CREATE TABLE IF NOT EXISTS [settings] (
@@ -467,6 +578,7 @@ require_once DIR_SYSTEM.'helpers/main.php';
 	
 	$query = $_pdo->exec("INSERT INTO [settings] (`key`, `value`) VALUES
 		('admin_activation', '0'),
+		('algorithm', 'sha512'),
 		('avatar_filesize', '102400'),
 		('avatar_height', '100'),
 		('avatar_width', '100'),
@@ -530,7 +642,7 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		('site_banner2', ''),
 		('site_intro', '<div style=\"text-align:center\">EN: Welcome to the website with demo version of eXtreme-Fusion 5: Ninja Edition</div>\r\n<div style=\"text-align:center\">PL: Witaj na stronie z wersją demo eXtreme-Fusion 5: Ninja Edition</div>\r\n<div style=\"text-align:center\">CZ: Vítejte na stránkách s demoverzí eXtreme-Fusion 5: Ninja Edition</div>'),
 		('site_name', 'DEMO:: eXtreme-Fusion 5 - Ninja Edition'),
-		('site_username', 'admin'),
+		('site_username', 'Admin'),
 		('smtp_host', ''),
 		('smtp_password', ''),
 		('smtp_port', '587'),
@@ -541,7 +653,7 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		('userthemes', '1'),
 		('user_custom_offset_timezone', '0'),
 		('validation', 'a:1:{s:8:\"register\";s:1:\"0\";}'),
-		('version', '5.0.1-unstable'),
+		('version', '5.0.4-unstable-demo'),
 		('visits_counter_enabled', '1');
 	");
 	
@@ -600,51 +712,26 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		(7, 'NEWS', 1, 'demo', 'demo', '3');
 	");
 	
+	$query = $_pdo->exec("CREATE TABLE IF NOT EXISTS [threads] (
+	  `id` int(11) NOT NULL AUTO_INCREMENT,
+	  `category_id` int(11) NOT NULL,
+	  `user_id` int(11) NOT NULL,
+	  `title` varchar(255) NOT NULL,
+	  `is_pinned` tinyint(1) NOT NULL DEFAULT '0',
+	  `timestamp` int(10) NOT NULL,
+	  PRIMARY KEY (`id`)
+	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=2 ;");
+	
+	$query = $_pdo->exec("INSERT INTO [threads] (`id`, `category_id`, `user_id`, `title`, `is_pinned`, `timestamp`) VALUES
+		(1, 1, 1, 'Test post', 0, ".time().");
+	");
+	
 	$query = $_pdo->exec("CREATE TABLE IF NOT EXISTS [time_formats] (
 		`id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
 		`value` varchar(100) NOT NULL DEFAULT '',
 		PRIMARY KEY (`id`),
 		UNIQUE KEY `value` (`value`)
 	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=1 ;");
-	
-	$query = $_pdo->exec("CREATE TABLE IF NOT EXISTS [users] (
-		`id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
-		`username` varchar(30) NOT NULL DEFAULT '',
-		`password` char(129) NOT NULL DEFAULT '',
-		`salt` char(5) NOT NULL DEFAULT '',
-		`user_hash` varchar(10) NOT NULL DEFAULT '',
-		`user_last_logged_in` int(10) unsigned NOT NULL DEFAULT '0',
-		`user_remember_me` tinyint(3) unsigned NOT NULL DEFAULT '0',
-		`admin_hash` varchar(10) NOT NULL DEFAULT '',
-		`admin_last_logged_in` int(10) unsigned NOT NULL DEFAULT '0',
-		`browser_info` varchar(100) NOT NULL DEFAULT '',
-		`link` varchar(30) NOT NULL DEFAULT '',
-		`email` varchar(100) NOT NULL DEFAULT '',
-		`hide_email` tinyint(3) unsigned NOT NULL DEFAULT '1',
-		`valid_code` varchar(32) NOT NULL DEFAULT '',
-		`valid` tinyint(4) NOT NULL DEFAULT '0',
-		`offset` char(5) NOT NULL DEFAULT '0',
-		`avatar` varchar(100) NOT NULL DEFAULT '',
-		`joined` int(10) unsigned NOT NULL DEFAULT '0',
-		`lastvisit` int(10) unsigned NOT NULL DEFAULT '0',
-		`datestamp` int(10) unsigned NOT NULL DEFAULT '0',
-		`ip` varchar(20) NOT NULL DEFAULT '0.0.0.0',
-		`status` tinyint(3) unsigned NOT NULL DEFAULT '0',
-		`actiontime` int(10) unsigned NOT NULL DEFAULT '0',
-		`theme` varchar(100) NOT NULL DEFAULT 'Default',
-		`roles` text NOT NULL,
-		`role` int(11) NOT NULL DEFAULT '2',
-		`lastupdate` int(11) NOT NULL DEFAULT '0',
-		`lang` varchar(20) NOT NULL,
-		PRIMARY KEY (`id`),
-		KEY `name` (`username`),
-		KEY `joined` (`joined`),
-		KEY `lastvisit` (`lastvisit`)
-	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=2 ;");
-	
-	$query = $_pdo->exec("INSERT INTO [users] (`id`, `username`, `password`, `salt`, `user_hash`, `user_last_logged_in`, `user_remember_me`, `admin_hash`, `admin_last_logged_in`, `browser_info`, `link`, `email`, `hide_email`, `valid_code`, `valid`, `offset`, `avatar`, `joined`, `lastvisit`, `datestamp`, `ip`, `status`, `actiontime`, `theme`, `roles`, `role`, `lastupdate`, `lang`) VALUES
-		(1, 'admin', '05b3f42ec52debb86545162b723a08cffa8476f029f4b03b7cde02ac107333881d816a13fe085f5227a377c8347feb512338ea7f9a8cdc35793fb1df658f6908', '9b9cc', '1b97b0ff', 1370083099, 0, 'e4d991c2', 1370082996, '3O7qs+2fqbG4MYqFDmk8axH7JtaROi7CMcFU8fR+YdU=', 'admin', 'admin@extreme-fusion.org', 1, '', 1, '0', '', 1369995541, 1370083197, 0, '0.0.0.0', 0, 0, 'Default', 'a:3:{i:0;i:1;i:1;i:2;i:2;i:3;}', 1, 1370083122, 'English');
-	");
 	
 	$query = $_pdo->exec("CREATE TABLE IF NOT EXISTS [users_data] (
 		`user_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -704,3 +791,15 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		(2, 'Informacje kontaktowe', 2),
 		(3, 'Różne', 3);
 	");
+	
+	$query = $_pdo->exec("CREATE TABLE IF NOT EXISTS [admin_favourites] (
+	  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+	  `user_id` mediumint(8) unsigned NOT NULL,
+	  `page_id` mediumint(8) unsigned NOT NULL,
+	  `count` mediumint(9) NOT NULL,
+	  `time` int(10) unsigned NOT NULL,
+	  PRIMARY KEY (`id`),
+	  UNIQUE KEY(`page_id`, `user_id`),
+	CONSTRAINT FOREIGN KEY (`page_id`) REFERENCES [admin](`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT FOREIGN KEY (`user_id`) REFERENCES [users](`id`) ON DELETE CASCADE ON UPDATE CASCADE
+	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=1 ;");

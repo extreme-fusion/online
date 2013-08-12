@@ -13,7 +13,6 @@
 | at www.gnu.org/licenses/agpl.html. Removal of this
 | copyright header is strictly prohibited without
 | written permission from the original author(s).
-|
 **********************************************************
                 ORIGINALLY BASED ON
 ---------------------------------------------------------+
@@ -35,7 +34,7 @@
 date_default_timezone_set('UTC');
 
 /*
-* Main Settings
+* General Settings
 */
 
 $_pdo->insert($_dbconfig['prefix'].'settings', array('key' => 'site_name', 'value' => 'eXtreme-Fusion CMS - Ninja Edition'));
@@ -119,6 +118,7 @@ $_pdo->insert($_dbconfig['prefix'].'settings', array('key' => 'userthemes', 'val
 //$_pdo->insert($_dbconfig['prefix'].'settings', array('key' => 'flood_autoban', 'value' => 1));
 $_pdo->insert($_dbconfig['prefix'].'settings', array('key' => 'deactivation_action', 'value' => 0));
 $_pdo->insert($_dbconfig['prefix'].'settings', array('key' => 'change_name', 'value' => 0));
+$_pdo->insert($_dbconfig['prefix'].'settings', array('key' => 'algorithm', 'value' => 'sha512'));
 
 $_pdo->insert($_dbconfig['prefix'].'settings', array('key' => 'maintenance', 'value' => 0));
 $_pdo->insert($_dbconfig['prefix'].'settings', array('key' => 'maintenance_message', 'value' => __('Welcome to eXtreme-Fusion CMS. Thank for using our CMS, Please turn off the maintenance mode in security, onces you have finished configuring your site.')));
@@ -135,7 +135,8 @@ $_pdo->insert($_dbconfig['prefix'].'settings', array('key' => 'notes_per_page', 
 $_pdo->insert($_dbconfig['prefix'].'settings', array('key' => 'users_per_page', 'value' => 10));
 $_pdo->insert($_dbconfig['prefix'].'settings', array('key' => 'comments_per_page', 'value' => 11));
 //$_pdo->insert($_dbconfig['prefix'].'settings', array('key' => 'flood_interval', 'value' => 15));
-$_pdo->insert($_dbconfig['prefix'].'settings', array('key' => 'version', 'value' => VERSION));
+$_pdo->insert($_dbconfig['prefix'].'settings', array('key' => 'version', 'value' => SYSTEM_VERSION));
+$_pdo->insert($_dbconfig['prefix'].'settings', array('key' => 'synchro', 'value' => 0));
 $_pdo->insert($_dbconfig['prefix'].'settings', array('key' => 'notes', 'value' => __('')));
 $_pdo->insert($_dbconfig['prefix'].'settings', array('key' => 'loging', 'value' => serialize(array(
 	'site_normal_loging_time' => 60*60*5,			// 5h
@@ -144,7 +145,7 @@ $_pdo->insert($_dbconfig['prefix'].'settings', array('key' => 'loging', 'value' 
 	'user_active_time' => 60*5						// 5min
 ))));
 $_pdo->insert($_dbconfig['prefix'].'settings', array('key' => 'routing', 'value' => serialize(array(
-	'param_sep' => '/',
+	'param_sep' => '-',
 	'main_sep' => '/',
 	'url_ext' => '.html',
 	'tpl_ext' => '.tpl',
@@ -160,7 +161,7 @@ $_pdo->insert($_dbconfig['prefix'].'settings', array('key' => 'cache', 'value' =
 	//'expire_rules' => '3600',
 	'expire_tags' => '3600',
 	'expire_team' => '3600',
-	'expire_users' => '3600',
+	'expire_users' => '3600'
 ))));
 
 /** Nie usuwac/Do not remove
@@ -181,17 +182,17 @@ $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, 
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.blacklist', 'blacklist.png', 'Blacklist', 'blacklist.php', 2)");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.comments', 'comments.png', 'Comments', 'comments.php', 2)");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.groups', 'groups.png', 'Groups', 'groups.php', 2)");
-$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.pages', 'pages.png', 'Pages', 'pages.php', 1)");
+$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.pages', 'pages.png', 'Content Pages', 'pages.php', 1)");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.logs', 'logs.png', 'Logs', 'logs.php', 2)");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.urls', 'urls.png', 'URLs Generator', 'urls.php', 3)");
 //$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.modules', 'modules.png', 'Modules', 'modules.php', 3)");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.news', 'news.png', 'News', 'news.php', 1)");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.panels', 'panels.png', 'Panels', 'panels.php', 3)");
-$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.panels', 'panels.png', 'Panel Editor', 'panel_editor.php', 3)");
+//$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.panels', 'panels.png', 'Panel Editor', 'panel_editor.php', 3)");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.permissions', 'permissions.png', 'Permissions', 'permissions.php', 2)");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.phpinfo', 'phpinfo.png', 'PHP Info', 'phpinfo.php', 3)");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.security', 'security.png', 'Security Politics', 'settings_security.php', '4')");
-$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.settings', 'settings.png', 'Main', 'settings_main.php', 4)");
+$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.settings', 'settings.png', 'General', 'settings_general.php', 4)");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.settings_banners', 'settings_banners.png', 'Banners', 'settings_banners.php', 4)");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.settings_cache', 'settings_cache.png', 'Cache', 'settings_cache.php', 4)");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.settings_time', 'settings_time.png', 'Time and Date', 'settings_time.php', 4)");
@@ -201,10 +202,11 @@ $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, 
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.settings_ipp', 'settings_ipp.png', 'Item per Page', 'settings_ipp.php', 4)");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.settings_logs', 'logs.png', 'Logs', 'settings_logs.php', 4)");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.settings_login', 'login.png', 'Login', 'settings_login.php', 4)");
+$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.settings_synchro', 'synchro.png', 'Synchronization', 'settings_synchro.php', 4)");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.settings_routing', 'router.png', 'Router', 'settings_routing.php', 4)");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.navigations', 'navigations.png', 'Site Links', 'navigations.php', 3)");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.smileys', 'smileys.png', 'Smileys', 'smileys.php', 3)");
-$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.upgrade', 'upgrade.png', 'Upgrade', 'upgrade.php', 3)");
+//$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.upgrade', 'upgrade.png', 'Upgrade', 'upgrade.php', 3)");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.user_fields', 'user_fields.png', 'User Fields', 'user_fields.php', 2)");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.user_fields_cats', 'user_fields_cats.png', 'User Field Categories', 'user_field_cats.php', 2)");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."admin (`permissions`, `image`, `title`, `link`, `page`) VALUES ('admin.users', 'users.png', 'Users', 'users.php', 2)");
@@ -267,7 +269,7 @@ $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."news_cats (`name`, `link`, `ima
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."news_cats (`name`, `link`, `image`) VALUES ('Themes', '".HELP::Title2Link(__('Themes'))."', 'themes.png')");
 //$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."news_cats (`name`, `link`, `image`) VALUES ('Windows', '".HELP::Title2Link(__('Windows'))."', 'windows.png')");
 
-$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."news  (`id`, `title`, `link`, `category`, `content`, `author`, `source`, `breaks`, `description`, `datestamp`, `access`, `reads`, `draft`, `sticky`, `allow_comments`, `allow_ratings`, `language`) VALUES (NULL, '".__('Example news title')."', '".__('Example news url')."', '3', '".__('Example news content')."', '1', 'http://extreme-fusion.org', '0', '".__('Example news description')."', '".time()."', '3', '1', '0', '0', '1', '1', '".$_SESSION['localeset']."')");
+$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."news  (`id`, `title`, `link`, `category`, `content`, `author`, `source`, `breaks`, `description`, `datestamp`, `access`, `reads`, `draft`, `sticky`, `allow_comments`, `allow_ratings`, `language`, `content_extended`) VALUES (NULL, '".__('Example news title')."', '".__('Example news url')."', '3', '".__('Example news content')."', '1', 'http://extreme-fusion.org', '0', '".__('Example news description')."', '".time()."', '3', '1', '0', '0', '1', '1', '".$_SESSION['localeset']."', '')");
 
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."tags  (`id`, `supplement`, `supplement_id`, `value`, `value_for_link`, `access`) VALUES (1, 'NEWS', 1, 'eXtreme-Fusion', 'extreme_fusion', '1')");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."tags  (`id`, `supplement`, `supplement_id`, `value`, `value_for_link`, `access`) VALUES (2, 'NEWS', 1, 'eXtreme-Fusion 5', 'extreme_fusion_5', '1')");
@@ -296,13 +298,13 @@ $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."user_field_cats (`name`, `order
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."user_field_cats (`name`, `order`) VALUES ('".__('Contact Information')."', 2)");
 $_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."user_field_cats (`name`, `order`) VALUES ('".__('Miscellaneous')."', 3)");
 
-$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."user_fields (`name`, `index`, `cat`, `type`) VALUES ('".__('First name')."', 'name', 1, 1)");
-$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."user_fields (`name`, `index`, `cat`, `type`) VALUES ('".__('Date of birth')."', 'old', 1, 1)");
-$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."user_fields (`name`, `index`, `cat`, `type`) VALUES ('".__('Gadu-Gadu')."', 'gg', 2, 1)");
-$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."user_fields (`name`, `index`, `cat`, `type`) VALUES ('".__('Skype')."', 'skype', 2, 1)");
-$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."user_fields (`name`, `index`, `cat`, `type`) VALUES ('".__('Website')."', 'www', 2, 1)");
-$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."user_fields (`name`, `index`, `cat`, `type`) VALUES ('".__('Living place')."', 'location', 2, 1)");
-$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."user_fields (`name`, `index`, `cat`, `type`) VALUES ('".__('Signature')."', 'sig', 3, 2)");
+$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."user_fields (`name`, `index`, `cat`, `type`, `option`) VALUES ('".__('First name')."', 'name', 1, 1, '')");
+$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."user_fields (`name`, `index`, `cat`, `type`, `option`) VALUES ('".__('Date of birth')."', 'old', 1, 1, '')");
+$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."user_fields (`name`, `index`, `cat`, `type`, `option`) VALUES ('".__('Gadu-Gadu')."', 'gg', 2, 1, '')");
+$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."user_fields (`name`, `index`, `cat`, `type`, `option`) VALUES ('".__('Skype')."', 'skype', 2, 1, '')");
+$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."user_fields (`name`, `index`, `cat`, `type`, `option`) VALUES ('".__('Website')."', 'www', 2, 1, '')");
+$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."user_fields (`name`, `index`, `cat`, `type`, `option`) VALUES ('".__('Living place')."', 'location', 2, 1, '')");
+$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."user_fields (`name`, `index`, `cat`, `type`, `option`) VALUES ('".__('Signature')."', 'sig', 3, 2, '')");
 
 //$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."settings_inf (`name`, `value`, `inf`) VALUES ('version', '5.0', '(Beta)')");
 
@@ -338,6 +340,7 @@ $_pdo->exec("INSERT INTO `".$_dbconfig['prefix']."permissions` (`name`, `section
 	('admin.settings_users', 1, '".__('Perm: admin settings_users')."', 1),
 	('admin.settings_ipp', 1, '".__('Perm: admin settings_ipp')."', 1),
 	('admin.settings_logs', 1, '".__('Perm: admin settings_logs')."', 1),
+	('admin.settings_synchro', 1, '".__('Perm: admin settings_synchro')."', 1),
 	('admin.navigations', 1, '".__('Perm: admin navigations')."', 1),
 	('admin.smileys', 1, '".__('Perm: admin smileys')."', 1),
 	('admin.upgrade', 1, '".__('Perm: admin upgrade')."', 1),
@@ -347,5 +350,3 @@ $_pdo->exec("INSERT INTO `".$_dbconfig['prefix']."permissions` (`name`, `section
 ");
 $_pdo->exec("INSERT INTO `".$_dbconfig['prefix']."permissions_sections` (`name`, `description`, `is_system`) VALUES ('admin', '".__('Administration')."', 1), ('site', '".__('Site')."', 1)");
 $_pdo->exec("INSERT INTO `".$_dbconfig['prefix']."groups` (`title`, `description`, `format`, `permissions`) VALUES ('".__('Admin')."', '".__('Group: admin')."', '<span style=\"color:#99bb00\">{username}</span>', '".serialize(array('*'))."'), ('".__('User')."', '".__('Group: user')."', '{username}', '".serialize(array('site.login', 'site.comment', 'site.comment.add', 'site.comment.edit'))."'), ('".__('Guest')."', '".__('Group: guest')."', '{username}', '".serialize(array())."')");
-
-$_pdo->exec("INSERT INTO ".$_dbconfig['prefix']."users_data (`user_id`) VALUES ('1')");

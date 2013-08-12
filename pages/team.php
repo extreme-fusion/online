@@ -37,7 +37,7 @@ $_head->set('<link href="'.ADDR_TEMPLATES.'stylesheet/team.css" media="screen" r
 // TO DO Będziesz dodawać cache dla tej strony użyj: $_sett->getUns('cache', 'expire_team') //
 
 $theme = array(
-	'Title' => __('Site Team').' &raquo; '.$_sett->get('site_name'),
+	'Title' => __('Site Team').' » '.$_sett->get('site_name'),
 	'Keys' => 'Ekipa '.$_sett->get('site_name').', skład, właściciele',
 	'Desc' => 'Lista osób odpowiedzialnych za działanie i funkcjonowanie strony.'
 );
@@ -45,7 +45,7 @@ $theme = array(
 define('THIS', TRUE);
 
 // Site Admin
-$row = $_pdo->getRow('SELECT * FROM [users] WHERE `id` = 1');
+$row = $_pdo->getRow('SELECT * FROM [users] WHERE `id` = 1 and `role` = 1');
 
 	if(time() <= $row['lastvisit']+300)
 	{
@@ -65,7 +65,7 @@ $row = $_pdo->getRow('SELECT * FROM [users] WHERE `id` = 1');
 		'joined' => HELP::showDate('shortdate', $row['joined']),
 		'last_visit' => $last_visit,
 		'link' => HELP::profileLink($row['username'], $row['id']),
-		'last_visit_time' => ($row['lastvisit'] != 0 ? HELP::showDate('shortdate', $row['lastvisit']) : __('Nie był na stronie')),
+		'last_visit_time' => ($row['lastvisit'] != 0 ? HELP::showDate('shortdate', $row['lastvisit']) : __('Never logged in')),
 		'is_online' => inArray($row['id'], $_user->getOnline(), 'id') ? 1 : 0,
 	);
 
@@ -96,7 +96,7 @@ if ($_pdo->getRowsCount($query))
 			'joined' => HELP::showDate('shortdate', $row['joined']),
 			'last_visit' => $last_visit,
 			'link' => HELP::profileLink($row['username'], $row['id']),
-			'last_visit_time' => ($row['lastvisit'] != 0 ? HELP::showDate('shortdate', $row['lastvisit']) : __('Nie był na stronie')),
+			'last_visit_time' => ($row['lastvisit'] != 0 ? HELP::showDate('shortdate', $row['lastvisit']) : __('Never logged in')),
 			'is_online' => inArray($row['id'], $_user->getOnline(), 'id') ? 1 : 0,
 		);
 	}
@@ -148,7 +148,7 @@ if($groups)
 					'joined' => HELP::showDate('shortdate', $user['joined']),
 					'last_visit' => $last_visit,
 					'link' => HELP::profileLink($user['username'], $user['id']),
-					'last_visit_time' => ($user['lastvisit'] != 0 ? HELP::showDate('shortdate', $user['lastvisit']) : __('Nie był na stronie')),
+					'last_visit_time' => ($user['lastvisit'] != 0 ? HELP::showDate('shortdate', $user['lastvisit']) : __('Never logged in')),
 					'is_online' => inArray($user['id'], $_user->getOnline(), 'id') ? 1 : 0
 				);
 			}

@@ -16,13 +16,13 @@
 |
 **********************************************************
                 ORIGINALLY BASED ON
----------------------------------------------------------+
+---------------------------------------------------------
 | PHP-Fusion Content Management System
 | Copyright (C) 2002 - 2011 Nick Jones
 | http://www.php-fusion.co.uk/
-+--------------------------------------------------------+
++-------------------------------------------------------
 | Author: Nick Jones (Digitanium)
-+--------------------------------------------------------+
++-------------------------------------------------------
 | This program is released as free software under the
 | Affero GPL license. You can redistribute it and/or
 | modify it under the terms of this license which you
@@ -30,17 +30,27 @@
 | at www.gnu.org/licenses/agpl.html. Removal of this
 | copyright header is strictly prohibited without
 | written permission from the original author(s).
-+--------------------------------------------------------*/
++-------------------------------------------------------*/
 $_locale->moduleLoad('lang', 'navigation_panel');
 
-$query = $_pdo->getData("
-	SELECT `name`, `url`, `window`, `visibility`, `rewrite` FROM [navigation]
-	WHERE `position` = 1 OR `position` = 3 ORDER BY `order`
-");
-
-if ($_pdo->getRowsCount($query))
+$cache = $_system->cache('navigation_panel', NULL, 'navigation_panel');
+if ($cache === NULL)
 {
-	foreach ($query as $data)
+	$query = $_pdo->getData("SELECT `name`, `url`, `window`, `visibility`, `rewrite` FROM [navigation]	WHERE `position` = 1 OR `position` = 3 ORDER BY `order`");
+	if ($_pdo->getRowsCount($query))
+	{
+		foreach ($query as $row)
+		{
+			$cache[] = $row;
+		}
+	}
+	
+	$_system->cache('navigation_panel', $cache, 'navigation_panel');
+}
+
+if($cache)
+{
+	foreach ($cache as $data)
 	{
 		if ($_user->hasAccess($data['visibility']))
 		{

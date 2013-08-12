@@ -32,14 +32,18 @@
 | written permission from the original author(s).
 +--------------------------------------------------------*/
 
-/*$theme = array(
-	'Title' => $data['title'].' &raquo; '.$_sett->get('site_name'),
-	'Keys' => $k,
-	'Desc' => $data['description']
-);*/
-
-// TO DO Będziesz dodawać cache dla tej strony użyj: $_sett->getUns('cache', 'expire_pages') //
-
+/*
+ * To do
+ * Przekazać nagłówki do systemu
+ * $theme = array(
+		'Title' => '',
+		'Keys' => '',
+		'Desc' => ''
+	);
+ * 
+ * Będziesz dodawać cache dla tej strony użyj: 
+ * $_sett->getUns('cache', 'expire_pages')
+ */
 
 if ($_user->isLoggedIn())
 {
@@ -67,7 +71,7 @@ if ($_route->getAction() == NULL)
 	$_tpl->assign('data', $data);
 	
 	$theme = array(
-		'Title' => 'Materiały i wpisy &raquo; '.$_sett->get('site_name'),
+		'Title' => 'Materiały i wpisy » '.$_sett->get('site_name'),
 		'Keys' => '',
 		'Desc' => ''
 	);
@@ -123,7 +127,7 @@ elseif ($_route->getAction() === 'type')
 				$_tpl->assign('type', $type['name']);
 				
 				$theme = array(
-					'Title' => $type['name'].' &raquo; '.$_sett->get('site_name'),
+					'Title' => $type['name'].' » '.$_sett->get('site_name'),
 					'Keys' => '',
 					'Desc' => ''
 				);
@@ -178,7 +182,7 @@ elseif ($_route->getAction() === 'category')
 				$_tpl->assign('data', $data);
 				
 				$theme = array(
-					'Title' => $category.' &raquo; '.$_sett->get('site_name'),
+					'Title' => $category.' » '.$_sett->get('site_name'),
 					'Keys' => HELP::Title2Link($category),
 					'Desc' => 'Materiały w kategorii '.$category
 				);
@@ -240,7 +244,7 @@ elseif ($_route->getAction() === 'categories')
 				$_tpl->assign('data', $data);
 				
 				$theme = array(
-					'Title' => $category.' &raquo; '.$_sett->get('site_name'),
+					'Title' => $category.' » '.$_sett->get('site_name'),
 					'Keys' => HELP::Title2Link($category),
 					'Desc' => 'Materiały w kategorii '.$category
 				);
@@ -270,7 +274,7 @@ elseif ($_route->getAction() === 'categories')
 		$_tpl->assign('data', $data);
 		
 		$theme = array(
-			'Title' => 'Kategorie materiałów &raquo; '.$_sett->get('site_name'),
+			'Title' => 'Kategorie materiałów » '.$_sett->get('site_name'),
 			'Keys' => '',
 			'Desc' => 'Kategorie materiałów zamieszczanych na stronie'
 		);
@@ -299,7 +303,7 @@ elseif (isNum($_route->getAction(), FALSE))
 
 
 
-			! class_exists('Tag') || $_tag = New Tag($_system, $_pdo);
+			
 			$keyword = array(); $k = array();
 			if ($keys = $_tag->getTag('PAGES', $row['id'])){
 				foreach($keys as $var){
@@ -324,7 +328,7 @@ elseif (isNum($_route->getAction(), FALSE))
 			}
 
 			$theme = array(
-				'Title' => $row['title'].' &raquo; '.$_sett->get('site_name'),
+				'Title' => $row['title'].' » '.$_sett->get('site_name'),
 				'Keys' => implode(', ', $k),
 				'Desc' => $row['description']
 			);

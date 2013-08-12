@@ -16,13 +16,13 @@
 | 
 **********************************************************
                 ORIGINALLY BASED ON
----------------------------------------------------------+
+---------------------------------------------------------
 | PHP-Fusion Content Management System
 | Copyright (C) 2002 - 2011 Nick Jones
 | http://www.php-fusion.co.uk/
-+--------------------------------------------------------+
++------------------------------------------------------
 | Author: Nick Jones (Digitanium)
-+--------------------------------------------------------+
++------------------------------------------------------
 | This program is released as free software under the
 | Affero GPL license. You can redistribute it and/or
 | modify it under the terms of this license which you
@@ -30,7 +30,7 @@
 | at www.gnu.org/licenses/agpl.html. Removal of this
 | copyright header is strictly prohibited without
 | written permission from the original author(s).
-+--------------------------------------------------------*/
++------------------------------------------------------*/
 try
 {
 	require_once '../../../config.php';
@@ -49,7 +49,7 @@ try
 		$_tpl = new General(DIR_ADMIN_PAGES.DS.'ajax'.DS.'templates'.DS);
 		
 		$_tag = new Tag($_system, $_pdo);
-		$_modules = new Modules($_pdo, $_sett, $_user, $_tag, $_locale);
+		$_modules = new Modules($_pdo, $_sett, $_user, $_tag, $_locale, $_system, $_request);
 		
 		$_panels = new Panels($_pdo);
 		

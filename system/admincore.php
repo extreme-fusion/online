@@ -16,13 +16,13 @@
 |
 **********************************************************
  	Some open-source code comes from
----------------------------------------------------------+
+---------------------------------------------------------
 | PHP-Fusion Content Management System
 | Copyright (C) 2002 - 2011 Nick Jones
 | http://www.php-fusion.co.uk/
-+--------------------------------------------------------+
++-------------------------------------------------------
 | Author: Nick Jones (Digitanium)
-+--------------------------------------------------------+
++-------------------------------------------------------
 | This program is released as free software under the
 | Affero GPL license. You can redistribute it and/or
 | modify it under the terms of this license which you
@@ -30,7 +30,7 @@
 | at www.gnu.org/licenses/agpl.html. Removal of this
 | copyright header is strictly prohibited without
 | written permission from the original author(s).
-+--------------------------------------------------------*/
++-------------------------------------------------------*/
 try
 {
 	require_once DIR_CLASS.'Exception.php';
@@ -79,6 +79,9 @@ try
 
 	# System configuration
     $_system = $ec->system;
+	
+	# Tags
+	! class_exists('Tag') || $_tag = New Tag($_system, $_pdo);
 
 	require_once DIR_SYSTEM.'table_list.php';
 
@@ -118,12 +121,21 @@ try
 	define('URL_REQUEST', isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI'] != '' ? HELP::cleanurl($_SERVER['REQUEST_URI']) : $_SERVER['SCRIPT_NAME']);
 	define('URL_QUERY', isset($_SERVER['QUERY_STRING']) ? HELP::cleanurl($_SERVER['QUERY_STRING']) : '');
 
+	$_url = new Url($_sett->getUns('routing', 'url_ext'), $_sett->getUns('routing', 'main_sep'), $_sett->getUns('routing', 'param_sep'), $_system->rewriteAvailable(), $_system->pathInfoExists());
+
+	Parser::registerFunc('url', $_url);
+	
     # Timezone settings
     date_default_timezone_set($_sett->get('timezone'));
 
 	#Parser
 	Parser::config($_pdo, $_sett, $_user, $_request, $_log);
 
+	# Favourite pages of Admin Panel
+	$_fav = new Favourites($_pdo);
+	$_fav->extend(array('fav_table' => 'admin_favourites', 'data_table' => 'admin'));
+	
+	// TODO: deprecated!
 	define('iGUEST', $_user->iGUEST());
     define('iUSER', $_user->iUSER());
     define('iADMIN', $_user->iADMIN());

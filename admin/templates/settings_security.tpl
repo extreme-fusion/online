@@ -16,13 +16,13 @@
 | 
 **********************************************************
                 ORIGINALLY BASED ON
----------------------------------------------------------+
+---------------------------------------------------------
 | PHP-Fusion Content Management System
 | Copyright (C) 2002 - 2011 Nick Jones
 | http://www.php-fusion.co.uk/
-+--------------------------------------------------------+
++------------------------------------------------------
 | Author: Paul Beuk (muscapaul)
-+--------------------------------------------------------+
++------------------------------------------------------
 | This program is released as free software under the
 | Affero GPL license. You can redistribute it and/or
 | modify it under the terms of this license which you
@@ -30,7 +30,7 @@
 | at www.gnu.org/licenses/agpl.html. Removal of this
 | copyright header is strictly prohibited without
 | written permission from the original author(s).
-+--------------------------------------------------------*/
++------------------------------------------------------*/
 *}
 
 <h3>{$SystemVersion} - {i18n('Settings')} &raquo; {i18n('Security')}</h3>
@@ -67,10 +67,7 @@
 	</div>
 	<h4>{i18n('Maintenance mode')}</h4>
 	<div class="tbl1">
-		<div class="grid_6 formLabel">{i18n('Maintenance mode enabled:')}
-			<small>EN: Switched off for security reasons.<br />
-				PL: Wyłączone ze względów bezpieczeństwa.<br />
-				CZ: Vypnutý z bezpečnostních důvodů.</small></div>
+		<div class="grid_6 formLabel">{i18n('Maintenance mode enabled:')}</div>
 		<div class="grid_1 formField"><label><input type="radio" name="maintenance" value="1"{if $maintenance == 1} checked="checked"{/if} /> {i18n('Yes')}</label></div>
 		<div class="grid_5 formField"><label><input type="radio" name="maintenance" value="0"{if $maintenance == 0} checked="checked"{/if} /> {i18n('No')}</label></div>
 	</div>

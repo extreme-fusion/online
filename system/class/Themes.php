@@ -13,7 +13,7 @@
 | at www.gnu.org/licenses/agpl.html. Removal of this
 | copyright header is strictly prohibited without
 | written permission from the original author(s).
-| 
+|
 **********************************************************
                 ORIGINALLY BASED ON
 ---------------------------------------------------------+
@@ -31,14 +31,22 @@
 | copyright header is strictly prohibited without
 | written permission from the original author(s).
 +--------------------------------------------------------*/
+interface Theme_Intf
+{
+	public function page();
+	
+	public function sidePanel();
+	
+	public function middlePanel();
 
-class Theme extends optClass
+}
+class Themes extends optClass
 {
 	public $_sett;
 	private $_tpl_file_name;
 
 	protected $_system;
-	
+
 	protected $_statistics;
 
 
@@ -58,20 +66,40 @@ class Theme extends optClass
 		$this->_request = $request;
 		$this->_route = $route;
 		$this->_head = $head;
-		$this->_theme = $sett->get('theme');
+
+		if ($user->iUSER())
+		{
+			if ($user->get('theme') !== 'Default' && $sett->get('userthemes') === '1')
+			{
+				$this->_theme = $user->get('theme');
+			}
+			else
+			{
+				$this->_theme = $sett->get('theme');
+			}
+		}
+		else
+		{
+			$this->_theme = $sett->get('theme');
+		}
+
 		$this->setConfig();
 		$this->_tpl_file_name = $tpl_file_name;
-		
-		$this->_head->set('
-			<link href="'.ADDR_COMMON_CSS.'facebox.css" rel="stylesheet">'.PHP_EOL.'
-			<script src="'.ADDR_COMMON_JS.'facebox.js"></script>'.PHP_EOL.'
-			<script>$(function() {
-				$(\'a[rel*=facebox]\').facebox();
-			});</script>
-		');
-	
+		$this->registerFunction('i18n', 'Locale');
+		if (function_exists('optUrl'))
+		{
+			$this->registerFunction('url', 'Url');
+		}
+		$this->_head->set('	<link href="'.ADDR_COMMON_CSS.'facebox.css" rel="stylesheet">
+	<script src="'.ADDR_COMMON_JS.'facebox.js"></script>
+	<script>
+		$(function() {
+			$(\'a[rel*=facebox]\').facebox();
+		});
+	</script>');
+
 	}
-	
+
 	public function setStatisticsInst($_inst)
 	{
 		$this->_statistics = $_inst;
@@ -79,17 +107,19 @@ class Theme extends optClass
 
 	protected function setConfig()
 	{
-		$this->setCompilePrefix('themes_');
-		$this->root            = DIR_THEMES.$this->_theme.DS.'templates'.DS;
-		$this->compile         = DIR_CACHE;
-		$this->cache           = DIR_SITE.'cache'.DS;
-		$this->gzipCompression = 0;
+		$this->setCompilePrefix('themes_'.(strtolower($this->_user->get('theme')) ? preg_replace("/[^a-zA-Z0-9_]/", '_', strtolower($this->_user->get('theme'))) : preg_replace("/[^a-zA-Z0-9_]/", '_', strtolower($this->_sett->get('theme')))).'_');
+		$this->root = DIR_THEMES.$this->_theme.DS.'templates'.DS;
+		$this->compile = DIR_CACHE;
+		//$this->compile = DIR_CACHE.'compile'.DS; 
+		$this->cache = DIR_SITE.'cache'.DS;
+		$this->gzipCompression = FALSE;
 		//$this->httpHeaders(OPT_HTML);
 	}
 
-	public function template($iframe)
+	public function render($filename)
 	{
 		$this->assign('ADDR_SITE', ADDR_SITE);
+		$this->assign('ADDR_ADMIN', ADDR_ADMIN);
 		$this->assign('THEME_ADDRESS', ADDR_SITE.'themes/'.$this->_theme.'/');
 		$this->assign('DIR_IMAGES', DIR_IMAGES);
 		$this->assign('THEME_IMAGES', THEME_IMAGES);
@@ -144,7 +174,9 @@ class Theme extends optClass
 			$this->assign('Page', $this->_request->get('page')->show());
 		}
 
-		$this->parse($iframe);
+		if (!strpos($filename, '.')) $filename = $filename.'.tpl';
+		
+		$this->parse($filename);
 		// Usuwanie danych z bufora OPT
 		$this->data = array();
 	}
@@ -217,7 +249,7 @@ class Theme extends optClass
 
 
 
-	public function showAdminLinks($class = FALSE)
+	public function showAdminPanelLink($class = FALSE)
 	{
 		if ($this->_user->hasPermission('admin.login'))
 		{
@@ -250,27 +282,41 @@ class Theme extends optClass
 		return $output;
 	}
 
-	public function showSubLinks($sep = "&middot;", $class = "")
-	{
-		$query = $this->_pdo->getData(
-			"SELECT `name`, `url`, `window`, `visibility`, `rewrite` FROM [navigation]
-			WHERE `position`='2' OR `position`='3' ORDER BY `order`"
-		);
-		if ($this->_pdo->getRowsCount($query))
+	public function showSubLinks($sep = "·", $class = "")
+	{	
+		$cache = $this->_system->cache('sublinks-'.(strtolower($this->_user->get('theme')) ? preg_replace("/[^a-zA-Z0-9_]/", '_', strtolower($this->_user->get('theme'))) : preg_replace("/[^a-zA-Z0-9_]/", '_', strtolower($this->_sett->get('theme')))), NULL, 'system');
+		if ($cache === NULL)
+		{
+			$query = $this->_pdo->getData("SELECT `name`, `url`, `window`, `visibility`, `rewrite` FROM [navigation] WHERE `position`='2' OR `position`='3' ORDER BY `order`");
+			if ($this->_pdo->getRowsCount($query))
+			{
+				foreach ($query as $row)
+				{
+					$cache[] = $row;
+				}
+			}
+			
+			$this->_system->cache('sublinks-'.(strtolower($this->_user->get('theme')) ? preg_replace("/[^a-zA-Z0-9_]/", '_', strtolower($this->_user->get('theme'))) : preg_replace("/[^a-zA-Z0-9_]/", '_', strtolower($this->_sett->get('theme')))), $cache, 'system');
+		}
+
+		if ($cache)
 		{
 			$i = 0; $menu = array();
-			foreach($query as $sdata)
+			foreach($cache as $sdata)
 			{
 				if ($sdata['url'] != "---" && $this->_user->hasAccess($sdata['visibility']))
 				{
+					$route = $this->_route->getFileName();
+					$path  = pathinfo($sdata['url'], PATHINFO_FILENAME);
+
 					$menu[] = array(
-						'sep' => $sep,
-						'link' => HELP::createNaviLink($sdata['url'], !$sdata['rewrite']),
-						//'name' => HELP::parseBBCode($sdata['name'], "b|i|u|color"),
-						'name' => $sdata['name'],
-						'target' => $sdata['window'] == '1' ? TRUE : FALSE,
-						'class' => ($i == 0 ? 'first-link'.($class ? ' '.$class : '') : ($class ? $class : '')),
-						'selected' =>  $this->_route->getFileName() == pathinfo($sdata['url'], PATHINFO_FILENAME) ? TRUE : FALSE
+						'sep'      => $sep,
+						'link'     => HELP::createNaviLink($sdata['url'], !$sdata['rewrite']),
+						//'name'     => HELP::parseBBCode($sdata['name'], "b|i|u|color"),
+						'name'     => $sdata['name'],
+						'target'   => ($sdata['window'] == '1'),
+						'class'    => ($i == 0 ? 'first-link'.($class ? ' '.$class : '') : ($class ? $class : '')),
+						'selected' => ($route == $path || ($path == '' && $route == $this->_sett->get('opening_page'))),
 					);
 					$i++;
 				}
@@ -278,34 +324,28 @@ class Theme extends optClass
 			return $menu;
 		}
 	}
-	
+
 	public function getVisitsCount()
 	{
 		if ($this->_statistics)
 		{
 			return $this->_statistics->getUniqueVisitsCount();
 		}
-		
+
 		return NULL;
 	}
-}
-
-class TPL
-{
-	protected static $_obj;
-
-	public static function build($obj)
+	
+	public function get()
 	{
-		self::$_obj = $obj;
+		return $this->data;
 	}
-
-	public static function this()
+	
+	public function obj($name)
 	{
-		return self::$_obj;
-	}
-
-	public static function get()
-	{
-		return self::$_obj->data;
+		$name = '_'.$name;
+		if (property_exists($this, $name))
+		{
+			return $this->$name;
+		}
 	}
 }

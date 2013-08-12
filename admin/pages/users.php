@@ -13,7 +13,6 @@
 | at www.gnu.org/licenses/agpl.html. Removal of this
 | copyright header is strictly prohibited without
 | written permission from the original author(s).
-|
 **********************************************************
                 ORIGINALLY BASED ON
 ---------------------------------------------------------+
@@ -44,6 +43,8 @@ try
     {
         throw new userException(__('Access denied'));
     }
+
+	$_fav->setFavByLink('users.php', $_user->get('id'));
 
     $_tpl = new Iframe;
 
@@ -502,7 +503,7 @@ try
 							'avatar' => $_user->getAvatarAddr($data['id']),
 							'joined' => HELP::showDate('shortdate', $data['joined']),
 							'status' => $data['status'],
-							'visit' => ($data['lastvisit'] != 0 ? HELP::showDate('shortdate', $data['lastvisit']) : __('Nie był na stronie')),
+							'visit' => ($data['lastvisit'] != 0 ? HELP::showDate('shortdate', $data['lastvisit']) : __('Never logged in')),
 							'theme' => $data['theme']
 						);
 					}

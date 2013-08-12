@@ -7,13 +7,13 @@
 | http://extreme-fusion.org/ 
 **********************************************************
  	Some open-source code comes from
----------------------------------------------------------+
+---------------------------------------------------------
 | PHP-Fusion Content Management System
 | Copyright (C) 2002 - 2011 Nick Jones
 | http://www.php-fusion.co.uk/
-+--------------------------------------------------------+
++-------------------------------------------------------
 | Author: Wooya
-+--------------------------------------------------------+
++-------------------------------------------------------
 | This program is released as free software under the
 | Affero GPL license. You can redistribute it and/or
 | modify it under the terms of this license which you
@@ -21,7 +21,7 @@
 | at www.gnu.org/licenses/agpl.html. Removal of this
 | copyright header is strictly prohibited without
 | written permission from the original author(s).
-+--------------------------------------------------------*/
++-------------------------------------------------------*/
 $_locale->load('code');
 
 $bbcode_info = array(
@@ -32,5 +32,6 @@ $bbcode_info = array(
 
 if($bbcode_used)
 {
-	$text = preg_replace("#\[code\](.*?)\[/code\]#sie", "'<div class=\'code\'>\\1</div>'", $text, 1);
+	$count = substr_count($text, "[code]");
+	for ($i=0;$i < $count;$i++) $text = preg_replace("#\[code\](.*?)\[/code\]#sie", "'<div class=\'code\'>\\1</div>'", $text, 1);
 }

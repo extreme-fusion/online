@@ -27,7 +27,7 @@ $mod_info = array(
 
 $admin_page[1] = array(
 	'title' => 'Sign Protection',
-	'image' => 'images/protection.png',
+	'image' => 'templates/images/protection.png',
 	'page' => 'admin/sign_protection.php',
 	'perm' => 'admin'
 );
@@ -38,14 +38,14 @@ $perm[1] = array(
 );
 
 $new_table[1] = array(
-	"sign_protection",
+	'sign_protection',
 	"(
 		`validation_type` TINYINT UNSIGNED NOT NULL DEFAULT '0'
 	) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci;"
 );
 $new_row[1] = array(
-	"sign_protection", 
-	"(`validation_type`) VALUES ('0')"
+	'sign_protection', 
+	"(`validation_type`) VALUES (0)"
 );
 
-$drop_table[1] = "sign_protection";
+$drop_table[1] = 'sign_protection';

@@ -16,14 +16,14 @@
 | 
 **********************************************************
                 ORIGINALLY BASED ON
----------------------------------------------------------+
+---------------------------------------------------------
 | PHP-Fusion Content Management System
 | Copyright (C) 2002 - 2011 Nick Jones
 | http://www.php-fusion.co.uk/
-+--------------------------------------------------------+
++-------------------------------------------------------
 | Author: Nick Jones (Digitanium)
 | Co-Author: Daywalker
-+--------------------------------------------------------+
++-------------------------------------------------------
 | This program is released as free software under the
 | Affero GPL license. You can redistribute it and/or
 | modify it under the terms of this license which you
@@ -31,7 +31,7 @@
 | at www.gnu.org/licenses/agpl.html. Removal of this
 | copyright header is strictly prohibited without
 | written permission from the original author(s).
-+--------------------------------------------------------*/
++-------------------------------------------------------*/
 *}
 
 <!DOCTYPE html>
@@ -41,12 +41,10 @@
 		<meta charset="{i18n('html_charset')}">
 		<meta name="description" content="{$Theme.Desc}">
 		<meta name="keywords" content="{$Theme.Keys}">
-		{literal}
-			<script> 
-				var addr_images = "{/literal}{$ADDR_IMAGES}{literal}";
-				var addr_site = "{/literal}{$ADDR_SITE}{literal}";
-			</script>
-		{/literal}
+		{literal}<script> 
+			var addr_images = "{/literal}{$ADDR_IMAGES}{literal}";
+			var addr_site = "{/literal}{$ADDR_SITE}{literal}";
+		</script>{/literal}
 		<link href="{$ADDR_FAVICON}" type="image/x-icon" rel="shortcut icon">
 		<link href="{$ADDR_COMMON_CSS}grid.reset.css" media="screen" rel="stylesheet">
 		<link href="{$ADDR_COMMON_CSS}grid.text.css" media="screen" rel="stylesheet">
@@ -68,13 +66,11 @@
 		<script src="{$ADDR_COMMON_JS}facebox.js"></script>
 		<script src="{$ADDR_JS}main.js"></script>
 		<script src="{$ADDR_COMMON_JS}common.js"></script>
-		{literal}
-		<script> 
+		{literal}<script>
 			jQuery(function($){ 
 				$('a[rel*=facebox]').facebox();
 			});
-		</script>
-		{/literal}
+		</script>{/literal}
 		{$Theme.Tags}
 	</head>
 	<body>
