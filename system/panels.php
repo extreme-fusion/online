@@ -13,16 +13,16 @@
 | at www.gnu.org/licenses/agpl.html. Removal of this
 | copyright header is strictly prohibited without
 | written permission from the original author(s).
-| 
+|
 **********************************************************
  	Some open-source code comes from
----------------------------------------------------------+
+---------------------------------------------------------
 | PHP-Fusion Content Management System
 | Copyright (C) 2002 - 2011 Nick Jones
 | http://www.php-fusion.co.uk/
-+--------------------------------------------------------+
++-------------------------------------------------------
 | Author: PHP-Fusion Development Team
-+--------------------------------------------------------+
++-------------------------------------------------------
 | This program is released as free software under the
 | Affero GPL license. You can redistribute it and/or
 | modify it under the terms of this license which you
@@ -30,7 +30,7 @@
 | at www.gnu.org/licenses/agpl.html. Removal of this
 | copyright header is strictly prohibited without
 | written permission from the original author(s).
-+--------------------------------------------------------*/
++-------------------------------------------------------*/
 
 $side_types = array(
 	'1' => 'LEFT',
@@ -40,6 +40,7 @@ $side_types = array(
 );
 
 $_panels = new Panels($_pdo, '..'.DS.'..'.DS.'modules'.DS);
+$_modules = new Modules($_pdo, $_sett, $_user, $_tag, $_locale, $_system, $_request);
 
 ob_start();
 
@@ -64,6 +65,7 @@ foreach($_panels->getPanelsList($_user) as $id => $data)
 		if ($to_load[0] !== NULL)
 		{
 			$_panel = new Panel($_route, $to_load[0]);
+			$_panel->setThemeInst($_theme);
 			include $to_load[1];
 			$_panel->template($to_load[2]);
 			unset($_panel);
@@ -77,15 +79,15 @@ foreach($_panels->getPanelsList($_user) as $id => $data)
 	{
 		if ($data['side'] === '2' || $data['side'] === '3')
 		{
-			opentable($data['name']);
+			$_theme->middlePanel($data['name']);
 				eval($_panels->closePHPSet($data['content'], TRUE));
-			closetable();
+			$_theme->middlePanel();
 		}
 		else
 		{
-			openside($data['name']);
+			$_theme->sidePanel($data['name']);
 				eval($_panels->closePHPSet($data['content'], TRUE));
-			closeside();
+			$_theme->sidePanel();
 		}
 	}
 }
@@ -93,7 +95,7 @@ foreach($_panels->getPanelsList($_user) as $id => $data)
 define($side, ob_get_contents());
 ob_end_clean();
 
-defined('LEFT') or define('LEFT', '');
-defined('RIGHT') or define('RIGHT', '');
-defined('TOP_CENTER') or define('TOP_CENTER', '');
-defined('BOTTOM_CENTER') or define('BOTTOM_CENTER', '');
+defined('LEFT') || define('LEFT', '');
+defined('RIGHT') || define('RIGHT', '');
+defined('TOP_CENTER') || define('TOP_CENTER', '');
+defined('BOTTOM_CENTER') || define('BOTTOM_CENTER', '');

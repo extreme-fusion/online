@@ -27,12 +27,13 @@ try
         throw new userException(__('Access denied'));
     }
 
+	$_fav->setFavByLink('groups.php', $_user->get('id'));
 	$_tpl = new Iframe;
 
-	// Wyœwietlenie komunikatów
+	// WyÅ›wietlenie komunikatÃ³w
 	if ($_request->get(array('status', 'act'))->show())
 	{
-		// Wyœwietli komunikat
+		// WyÅ›wietli komunikat
 		$_tpl->getMessage($_request->get('status')->show(), $_request->get('act')->show(),
 			array(
 				'add' => array(
@@ -90,7 +91,7 @@ try
 					unset($permissions);
 				}
 
-				$_system->clearCache();
+				$_system->clearCacheRecursive($_files);
 
 				if ($count)
 				{
@@ -183,7 +184,7 @@ try
 
 				unset($permissions);
 
-				$_system->clearCache();
+				$_system->clearCacheRecursive($_files);
 
 				if ($count)
 				{
@@ -242,7 +243,7 @@ try
 			
 			$_pdo->exec('UPDATE [users] SET `role` = 2 WHERE `role` = '.$_request->get('id')->show());
 			
-			$_system->clearCache();
+			$_system->clearCacheRecursive($_files);
 
 			if ($count)
 			{

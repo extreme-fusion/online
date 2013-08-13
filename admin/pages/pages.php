@@ -13,7 +13,6 @@
 | at www.gnu.org/licenses/agpl.html. Removal of this
 | copyright header is strictly prohibited without
 | written permission from the original author(s).
-|
 **********************************************************
                 ORIGINALLY BASED ON
 ---------------------------------------------------------+
@@ -50,11 +49,13 @@ try
 	 * Załączam najpierw plik językowy, gdyż w klasie może wystąpić błąd.
 	 * Wtedy komunikat zostanie wyświetlony w odpowiednim języku.
 	 */
-	$_locale->load('pages');
+	$_locale->load('content_pages');
 
 	/** Załączam model-klasę do obsługi Stron **/
 	require DIR_CLASS.'Pages.php';
 
+	$_fav->setFavByLink('pages.php', $_user->get('id'));
+	
     $_tpl = new Iframe;
 
 	// Zarządzanie typami treści
@@ -369,7 +370,7 @@ try
 				}
 				else
 				{
-					! class_exists('Tag') || $_tag = New Tag($_system, $_pdo);
+					
 					$bind = array(
 						array(':title', $_request->post('title')->strip(), PDO::PARAM_STR),
 						array(':description', $_request->post('description')->strip(), PDO::PARAM_STR),
@@ -502,7 +503,7 @@ try
 			{
 				if ($row = $_pdo->getRow('SELECT * FROM [pages] WHERE id = '.$_request->get('id')->show()))
 				{
-					! class_exists('Tag') || $_tag = New Tag($_system, $_pdo);
+					
 
 					$keywords = array();
 					if ($keys = $_tag->getTag('PAGES', $_request->get('id')->show())){

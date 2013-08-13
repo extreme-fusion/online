@@ -47,6 +47,8 @@ function render_page($banners = TRUE, $menu = TRUE, $left = TRUE, $right = TRUE,
 		TPL::this()->assign('VisitsCount', TPL::this()->getVisitsCount());
 	}
 	
+	TPL::this()->assign('reset', HELP::showDate('shortdate', TPL::this()->_sett->get('demo_last_reset')));
+	
 	// Renderowanie pliku szablonu
 	TPL::this()->template('page.tpl');
 }
