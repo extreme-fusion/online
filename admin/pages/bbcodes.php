@@ -45,6 +45,7 @@ try
 		throw new userException(__('Access denied'));
 	}
 
+	$_fav->setFavByLink('bbcodes.php', $_user->get('id'));
 	$_tpl = new Iframe;
 
 	if ($_request->get(array('status', 'act'))->show())
@@ -82,6 +83,7 @@ try
 
 		if ($count)
 		{
+			$_system->clearCacheRecursive($_files);
 			$_log->insertSuccess('delete', __('Tag has been deactivated'));
 			$_request->redirect(FILE_PATH, array('act' => 'delete', 'status' => 'ok'));
 		}
@@ -115,6 +117,7 @@ try
 
 			if ($count)
 			{
+				$_system->clearCacheRecursive($_files);
 				$_log->insertSuccess('add', __('Tag has been activated'));
 				$_request->redirect(FILE_PATH, array('act' => 'add', 'status' => 'ok'));
 			}

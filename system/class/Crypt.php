@@ -16,10 +16,10 @@
 *********************************************************/
 
 /**
- * Przyk≥ad dzia≥ania:
+ * Przyk≈Çad dzia≈Çania:
  *
-	// Drugi parametr koniecznie 8 znakÛw.
-	$c = new Crypt('klucz szyfrujπcy', '=thn<.?!');
+	// Drugi parametr koniecznie 8 znak√≥w.
+	$c = new Crypt('klucz szyfrujƒÖcy', '=thn<.?!');
 
 	echo $e = $c->encrypt('test');
 	echo $c->decrypt($e);
@@ -34,11 +34,11 @@ class Crypt
 	protected $_iv;
 
 	/**
-	 * Przy pominiÍciu drugiego parametru, kodowanie udbywa siÍ w jednπ stronÍ.
-	 * Wektor inicjujπcy `iv` jest zmienny z prze≥adowaniem strony.
+	 * Przy pominiƒôciu drugiego parametru, kodowanie udbywa siƒô w jednƒÖ stronƒô.
+	 * Wektor inicjujƒÖcy `iv` jest zmienny z prze≈Çadowaniem strony.
 
-	 * Jeúli dane majπ byÊ rozkodowane w przysz≥oúci, naleøy posiadaÊ sta≥y wektor inicjujπcy i podaÊ go drugim parametrem.
-	 * Niezmienny musi byÊ teø `key` - klucz szyfrujπcy.
+	 * Je≈õli dane majƒÖ byƒá rozkodowane w przysz≈Ço≈õci, nale≈ºy posiadaƒá sta≈Çy wektor inicjujƒÖcy i podaƒá go drugim parametrem.
+	 * Niezmienny musi byƒá te≈º `key` - klucz szyfrujƒÖcy.
 	 */
 	public function __construct($key, $iv = NULL, $cipher = MCRYPT_BLOWFISH, $mode = MCRYPT_MODE_CBC, $source = MCRYPT_DEV_URANDOM)
 	{
@@ -64,12 +64,12 @@ class Crypt
 
 	public function encrypt($data)
 	{
-		return base64_encode(mcrypt_encrypt($this->_cipher, $this->_key, $data, $this->_mode, $this->_iv));
+		return urlencode(base64_encode(mcrypt_encrypt($this->_cipher, $this->_key, $data, $this->_mode, $this->_iv)));
 	}
 
 	public function decrypt($data)
 	{
-		return mcrypt_decrypt($this->_cipher, $this->_key, base64_decode($data), $this->_mode, $this->_iv);
+		return mcrypt_decrypt($this->_cipher, $this->_key, base64_decode(urldecode($data)), $this->_mode, $this->_iv);
 	}
 	
 	public function correctAnswer($user_answer, $answer)

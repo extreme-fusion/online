@@ -12,6 +12,8 @@ class CommentPageNav
 	protected $item_id;
 	protected $buttons_count;
 	protected $filename;
+	protected $dir;
+	protected $name;
 
 	public function __construct($ec, $_pdo, $_tpl)
 	{
@@ -20,7 +22,7 @@ class CommentPageNav
 		$this->ec = $ec;
 	}
 
-	public function create($item_id, $current_page, $limit, $buttons_count, $filename)
+	public function create($item_id, $current_page, $limit, $buttons_count, $filename, $name = 'page_nav', $dir = NULL)
 	{
 		$i = 0;
 		foreach(func_get_args() as $arg)
@@ -37,7 +39,7 @@ class CommentPageNav
 
 			if (!is_numeric($arg) || !$arg)
 			{
-				throw new systemException('Paramter metody CommentPageNav::create() nie jest numeryczny lub jest równy 0!');
+				throw new systemException('Paramter metody CommentPageNav::create() nie jest numeryczny lub jest rÃ³wny 0!');
 			}
 
 			$i++;
@@ -53,6 +55,8 @@ class CommentPageNav
 		$this->filename = $filename;
 		$this->current_page = $current_page;
 		$this->item_id = intval($item_id);
+		$this->dir = $dir;
+		$this->name = $name;
 
 		$this->parse();
 	}
@@ -65,7 +69,7 @@ class CommentPageNav
 
 			$data = $this->ec->pageNav->create($this->_tpl, $this->buttons_count);
 
-			$this->ec->pageNav->get($data, 'page_nav');
+			$this->ec->pageNav->get($data, $this->name, $this->dir);
 		}
 
 		$this->_tpl->assign('comments', $this->ec->comment->get($this->filename, $this->item_id, $this->current_page, $this->limit));

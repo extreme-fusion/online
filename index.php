@@ -13,7 +13,6 @@
 | at www.gnu.org/licenses/agpl.html. Removal of this
 | copyright header is strictly prohibited without
 | written permission from the original author(s).
-|
 **********************************************************
                 ORIGINALLY BASED ON
 ---------------------------------------------------------+
@@ -39,15 +38,6 @@ try
 
 	require_once 'system/sitecore.php';
 
-	/**
-	 * Szablon systemowy (theme)
-	 */
-
-	// Wczytywanie głównej klasy
-	require_once DIR_CLASS.'Themes.php';
-
-	/******* Koniec sekcji szablonu systemowego */
-
 	// Routing class
 	$_route = new Router($_request, $_sett, $_system->rewriteAvailable(), 'page', $_system->pathInfoExists(), $_sett->get('opening_page'), TRUE, TRUE, FALSE, 'admin');
 
@@ -56,11 +46,13 @@ try
 		exit('eXtreme-Fusion '.$_sett->get('version'));
 	}
 	
-	if ($_user->bannedByIP())
-	{
-		$_route->trace(array('controller' => 'error', 'action' => 403, 'params' => NULL));
-	}
+	$banned_by_ip = $_user->bannedByIP();
 	
+	if ($banned_by_ip)
+	{
+		$_route->trace(array('controller' => 'error', 'action' => 403));
+	}
+
 	StaticContainer::register('route', $_route);
 
 	// Tryb prac na serwerze
@@ -93,10 +85,8 @@ try
 		}
 	}
 
-	/** Konfiguracja obiektu szablonu **/
+	/** Konfiguracja obiektu szablonu dla podstron **/
 	$_tpl = new Site($_route);
-
-	//$_tpl->registerFunction('url', 'Url');
 
 	// Nie usuwać
 	/**
@@ -114,7 +104,7 @@ try
 			$_route->setAdminFile($row['file']);
 		}
 	}*/
-	
+
 
 	// Scieżki, w których jest wyszukiwany plik wg kolejności przeszukiwania
 	$folders = array(
@@ -132,7 +122,7 @@ try
 		$row = $_pdo->getRow('SELECT full_path FROM [links] WHERE short_path =:short_path ORDER BY `datestamp` DESC LIMIT 1',
 			array(':short_path', substr(PATH_INFO, 0, 1) === '/' ? substr(PATH_INFO, 1) : PATH_INFO, PDO::PARAM_STR)
 		);
-		
+
 		if ($row)
 		{
 			$_route->setNewConfig($row['full_path']);
@@ -147,20 +137,12 @@ try
 			$_route->setExitFile();
 		}
 	}
-	
-	
-	// Tworzenie emulatora statyczności klasy OPT
-	TPL::build($_theme = new Theme($_sett, $_system, $_user, $_pdo, $_request, $_route, $_head, $_route->getTplFileName()));
-
-	//$_theme->registerFunction('url', 'Url');
-
-	$_theme->setStatisticsInst($ec->statistics);
 
 	if ($_sett->get('visits_counter_enabled'))
 	{
 		$ec->statistics->saveUniqueVisit($_user->getIP());
 	}
-
+	
 	// Ładowanie pliku startowego modułu
 	if ($row = $ec->modules->getModuleBootstrap($_system))
 	{
@@ -170,18 +152,31 @@ try
 		}
 	}
 
-	require_once DIR_THEME.'core'.DS.'theme.php';
+	/**
+	 * Szablon systemowy (theme)
+	 */
+
+	// Załączanie klasy szablonu
+	require_once DIR_THEME.'view.php';
+
+	$_theme = new Theme($_sett, $_system, $_user, $_pdo, $_request, $_route, $_head, $_route->getTplFileName());
+
+	$_theme->setStatisticsInst($ec->statistics);
+
+	Parser::setThemeInst($_theme);
+
+	/******* Koniec sekcji szablonu systemowego */
 
 	/* GENEROWANIE STRONY Z PLIKU PHP */
 
 	// Sprawdzanie, czy plik istnieje
 	if ( ! $_route->getExitFile())
 	{
-		$_route->trace(array('controller' => 'error', 'action' => 404, 'params' => NULL));
+		$_route->trace(array('controller' => 'error', 'action' => 404));
 	}
 
 	$trace = $_route->getExitFile();
-
+	ob_start();
 	// Ładowanie pliku PHP wybranej podstrony
 	require $_route->getExitFile();
 
@@ -190,8 +185,10 @@ try
 	{
 		// Załączanie pliku z trace'a. Zmienił się też TPL.
 		require $_route->getExitFile();
-	}
 
+	}
+	$render = ob_get_contents();
+	ob_clean();
 	// Załączanie predefiniowanych elementów szablonu systemu (panele)
 	if ($_route->getFileName() !== 'maintenance')
 	{
@@ -238,7 +235,7 @@ try
 	ob_start();
 
 	/* PREZENTACJA STRONY Z PLIKU TPL */
-
+	echo $render;
 	if ( ! isset($exc_error))
 	{
 		if (! $_tpl->getPageCompileDir())
@@ -295,21 +292,18 @@ try
 	defined('CONTENT') || define('CONTENT', ob_get_contents());
 	ob_end_clean();
 
-	if ($_route->getFileName() === 'maintenance')
+	if ($_route->getFileName() === 'maintenance' || $banned_by_ip)
 	{
 		// Renderowanie strony bez menu, paneli bocznych i stopki
-		render_page(TRUE, FALSE, FALSE, FALSE, FALSE);
+		$_theme->page(TRUE, FALSE, FALSE, FALSE, FALSE);
 	}
 	else
 	{
-		render_page();
+		$_theme->page();
 	}
-	
+
 	// Załączanie szablonu zamykającego stronę
 	$_tpl->template('pre'.DS.'footer'.$_route->getExt('tpl'));
-
-	// Usuwanie niepotrzebnych wpisów z tabeli użytkowników online.
-	$_pdo->exec('DELETE FROM [users_online] WHERE `last_activity` < '.(time()-60*60*2));
 
 	session_write_close();
 }
@@ -327,5 +321,5 @@ catch(userException $exception)
 }
 catch(PDOException $exception)
 {
-   echo $exception;
+   PDOErrorHandler($exception);
 }

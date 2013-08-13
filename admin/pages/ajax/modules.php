@@ -76,16 +76,17 @@ try
 		{
 			if ($_user->hasPermission('admin.panels'))
 			{
-				$req = get_object_vars(json_decode($_request->post('SortOrder')->show()));
+				$req = json_decode($_request->post('SortOrder')->show());
+				
 				$_tag = new Tag($_system, $_pdo);
-				$_modules = new Modules($_pdo, $_sett, $_user, $_tag, $_locale);
+				$_modules = new Modules($_pdo, $_sett, $_user, $_tag, $_locale, $_system, $_request);
 				$_panels = new Panels($_pdo);
 
 				$_panels->setModulesInst($_modules);	
    
 				// Tworzy listę modułów nieaktywnych 
 				$inactive = $_panels->getInactivePanelsDir($_user, TRUE);
-				
+
 				// Walidacja danych wejściowych
 				foreach($req as $column => $panels)
 				{
@@ -295,6 +296,7 @@ try
 
 					$i++;
 				}
+				$_system->clearCacheRecursive($_files);
 				_e(__('Dane zostały pomyślnie zapisane'));
 			}
 
@@ -318,6 +320,7 @@ try
 
 					$i++;
 				}
+				$_system->clearCacheRecursive($_files);
 				_e(__('Dane zostały pomyślnie zapisane'));
 			}
 
@@ -341,7 +344,7 @@ try
 
 					$i++;
 				}
-				$_system->clearCache('profiles');
+				$_system->clearCacheRecursive($_files);
 				_e(__('Dane zostały pomyślnie zapisane'));
 			}
 

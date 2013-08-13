@@ -45,10 +45,8 @@ if ($_route->getAction() && $_route->getAction() !== 'page')
 
 	if ( ! file_exists(DIR_THEME.'templates'.DS.'pages'.DS.'news.tpl'))
 	{
-		$_head->set('<link href="'.ADDR_CSS.'news.css" rel="stylesheet">');
+		$_head->set('	<link href="'.ADDR_CSS.'news.css" rel="stylesheet">');
 	}
-
-	! class_exists('Tag') || $_tag = New Tag($_system, $_pdo);
 
 	$item_id = $_route->getAction();
 
@@ -88,7 +86,7 @@ if ($_route->getAction() && $_route->getAction() !== 'page')
 			$keyword = Html::arrayToLinks($keyword, ', ');
 
 			$theme = array(
-				'Title' => $data['title'].' &raquo; '.$_sett->get('site_name'),
+				'Title' => $data['title'].' » '.$_sett->get('site_name'),
 				'Keys' => implode(', ', $k),
 				'Desc' => $data['description']
 			);
@@ -152,7 +150,7 @@ else
 
 	if ( ! file_exists(DIR_THEME.'templates'.DS.'pages'.DS.'news.tpl'))
 	{
-		$_head->set('<link href="'.ADDR_TEMPLATES.'stylesheet/news.css" rel="stylesheet">');
+		$_head->set('	<link href="'.ADDR_TEMPLATES.'stylesheet/news.css" rel="stylesheet">');
 	}
 
 	$title = array(
@@ -270,11 +268,11 @@ else
 	}
 
 	// Załączanie pluginów
-	if (function_exists('render_news'))
+	if (method_exists($_theme, 'news'))
 	{
-		render_news();
+		$_theme->news();
 
 		// Scalanie pluginów ze zmiennymi OPT Routera
-		$_tpl->data = array_merge($_tpl->data, TPL::get());
+		$_tpl->data = array_merge($_tpl->data, $_theme->get());
 	}
 }

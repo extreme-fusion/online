@@ -13,7 +13,6 @@
 | at www.gnu.org/licenses/agpl.html. Removal of this
 | copyright header is strictly prohibited without
 | written permission from the original author(s).
-|
 **********************************************************
                 ORIGINALLY BASED ON
 ---------------------------------------------------------+
@@ -33,10 +32,29 @@
 +--------------------------------------------------------*/
 try
 {
-	require_once '../config.php';
-	require DIR_SITE.'bootstrap.php';
-	require_once DIR_SYSTEM.'admincore.php';
+	define('DIR_BASE', realpath(dirname(__FILE__).DIRECTORY_SEPARATOR.'..').DIRECTORY_SEPARATOR);
 
+	if ( ! file_exists(DIR_BASE.'config.php'))
+	{
+		if (file_exists(DIR_BASE.'install'.DIRECTORY_SEPARATOR))
+		{
+			header('Location: ../install/');
+			exit;
+		}
+		else
+		{
+			die('Installer not found on server. Please upload install directory again.');
+		}
+	}
+	else
+	{
+		require DIR_BASE.'config.php';
+		require DIR_SITE.'bootstrap.php';
+		require_once DIR_SYSTEM.'admincore.php';
+	}
+	
+	$_locale->load('favourites');
+	
 	$tpl = new AdminMainEngine;
 
 	if ($_user->bannedByIP())
@@ -113,6 +131,12 @@ try
 		}
 	}
 
+	// Pobieranie ulubionych podstron zalogowanego admina
+	$fav = $_fav->get($_user->get('id'));
+	if ($fav)
+	{
+		$tpl->assign('has_favourite', TRUE);
+	}
 	$tpl->template('pre'.DS.'_framework');
 }
 catch(optException $exception)

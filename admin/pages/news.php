@@ -40,6 +40,8 @@ try
 
 	$_locale->load('news');
 
+	$_fav->setFavByLink('news.php', $_user->get('id'));
+	
 	$_tpl = new Iframe;
 
 	if($_request->get('page')->show() === 'news')
@@ -48,8 +50,6 @@ try
 		{
 			throw new userException(__('Access Denied'));
 		}
-
-		! class_exists('Tag') || $_tag = New Tag($_system, $_pdo);
 
 		// Wyświetlenie komunikatów
 		if ($_request->get(array('status', 'act'))->show())
