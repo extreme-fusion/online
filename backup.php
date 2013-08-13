@@ -21,6 +21,7 @@ require DIR_SITE.'bootstrap.php';
 require_once DIR_CLASS.'Exception.php';
 require_once OPT_DIR.'opt.class.php';
 require_once DIR_SYSTEM.'helpers/main.php';
+define('VERSION', '5.0.3');
 
 	$_locale = new Locales('English', DIR_LOCALE);
 
@@ -50,42 +51,30 @@ require_once DIR_SYSTEM.'helpers/main.php';
 	$_system->clearCache('system');
 	$_system->clearCache('users');
 
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [admin_favourites]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [users]');
+	$r = $_pdo->query('SHOW TABLES');
+
+	$data = array();
+	foreach($r as $e)
+	{
+		$data[] = $e;
+	}
+	$table = array();
+	foreach($data as $val)
+	{
+		foreach($val as $d)
+		{
+			$table[] = $d;
+		}
+	}
+  
+	foreach($table as $val)
+	{  
+		if ($val !== $_dbconfig['prefix'].'admin' && $val !== 'online_statistics')
+		{
+			$query = $_pdo->exec('DROP TABLE IF EXISTS '.$val);
+		}
+	}
 	$query = $_pdo->exec('DROP TABLE IF EXISTS [admin]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [bbcodes]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [boards]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [board_categories]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [blacklist]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [comments]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [cookies]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [entries]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [groups]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [links]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [logs]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [messages]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [modules]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [navigation]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [news]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [news_cats]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [notes]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [pages]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [pages_categories]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [pages_custom_settings]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [pages_types]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [panels]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [permissions]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [permissions_sections]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [settings]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [smileys]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [statistics]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [tags]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [threads]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [time_formats]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [users_data]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [users_online]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [user_fields]');
-	$query = $_pdo->exec('DROP TABLE IF EXISTS [user_field_cats]');
 	
 	$_files->rmDirRecursive(DIR_UPLOAD);
 	
@@ -379,7 +368,7 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		KEY `reads` (`reads`)
 	) ENGINE=InnoDB CHARACTER SET ".$charset." COLLATE ".$collate." AUTO_INCREMENT=2 ;");
 	
-	$news = '<div style="text-align: center;">\r\n	<img alt="eXtreme-Fusion 5 :: Demo :: EN" src="http://localhost/extreme/demo/templates/images/ef_demo/gb.png" style="width: 66px; height: 83px; float: left;" /></div>\r\n<div style="text-align: center;">\r\n	<em><img alt="eXtreme-Fusion 5 :: DEMO : EN" src="http://localhost/extreme/demo/templates/images/ef_demo/gb.png" style="width: 66px; height: 83px; float: right;" /></em></div>\r\n<div>\r\n	&nbsp;</div>\r\n<div style="text-align: center;">\r\n	<em>You don&#39;t have <a href="http://extreme-fusion.org">eXtreme-Fusion 5: Ninja Edition</a>?</em><br />\r\n	<em>Do you want to get familiar with it before you download it?&nbsp;</em><br />\r\n	<em>We have prepared special demo version of eXtreme-Fusion 5!</em></div>\r\n<div style="text-align: center;">\r\n	&nbsp;</div>\r\n<div style="text-align: center;">\r\n	&nbsp;</div>\r\n<div>\r\n	<span style="color:#ffa500;"><strong>We are giving you a&nbsp;possibility to test the most of system functions!</strong></span><br />\r\n	News writing, adding accounts from Admin Panel, managing of groups permissions, settings, panel system, adding new pages and installing new modules with ability to manage them.</div>\r\n<div>\r\n	&nbsp;</div>\r\n<div>\r\n	<strong><span style="color:#ffa500;">Do you want to see how it looks? Get familiar with system today!</span></strong><br />\r\n	Only thing to do is login using following user data:</div>\r\n<div>\r\n	&nbsp;</div>\r\n<div style="text-align: center;">\r\n	<strong><span style="color:#ffa500;">Username:</span> Admin</strong><br />\r\n	<strong><span style="color:#ffa500;">Password:</span> administrator5</strong></div>\r\n<div style="text-align: center;">\r\n	&nbsp;</div>\r\n<div style="text-align: center;">\r\n	&nbsp;</div>\r\n<hr />\r\n<div style="text-align: center;">\r\n	<img alt="eXtreme-Fusion 5 :: Demo :: PL" src="http://localhost/extreme/demo/templates/images/ef_demo/pl.png" style="width: 66px; height: 83px; float: left;" /></div>\r\n<div style="text-align: center;">\r\n	<em><img alt="eXtreme-Fusion 5 :: DEMO : PL" src="http://localhost/extreme/demo/templates/images/ef_demo/pl.png" style="width: 66px; height: 83px; float: right;" /></em></div>\r\n<div>\r\n	<div>\r\n		&nbsp;</div>\r\n	<div style="text-align: center;">\r\n		<em>Nie posiadasz jeszcze <a href="http://extreme-fusion.org">eXtreme-Fusion 5: Ninja Edition</a>?&nbsp;</em><br />\r\n		<em>Przed pobraniem chcesz zapoznać się z&nbsp;systemem?</em><br />\r\n		<em>Przygotowaliśmy dla Ciebie wersję demonstracyjną eXtreme-Fusion 5!</em></div>\r\n	<div style="text-align: center;">\r\n		&nbsp;</div>\r\n	<div style="text-align: center;">\r\n		&nbsp;</div>\r\n	<div>\r\n		<span style="color:#ffa500;"><strong>Dajemy Ci praktycznie wszystkie możliwości sprawdzenia systemu!</strong></span><br />\r\n		Pisanie news&oacute;w, dodawanie kont z&nbsp;poziomu administratora, zarządzanie grupami uprawnień, ustawieniami, układem paneli, dodawanie stron treści oraz instalowanie systemowych moduł&oacute;w i&nbsp;zabawa nimi.</div>\r\n	<div>\r\n		&nbsp;</div>\r\n	<div>\r\n		<strong><span style="color:#ffa500;">Chesz zobaczyć jak to wygląda? Zapoznaj się z&nbsp;systemem już dziś!&nbsp;</span></strong><br />\r\n		Wystarczy tylko, że się zalogujesz korzystając z&nbsp;poniższych danych:</div>\r\n	<div>\r\n		&nbsp;</div>\r\n	<div style="text-align: center;">\r\n		<strong><span style="color:#ffa500;">Nazwa użytkownika:</span> Admin</strong><br />\r\n		<strong><span style="color:#ffa500;">Hasło:</span> administrator5</strong></div>\r\n</div>\r\n<div style="text-align: center;">\r\n	&nbsp;</div>\r\n<div style="text-align: center;">\r\n	&nbsp;</div>\r\n<hr />\r\n<div style="text-align: center;">\r\n	<img alt="eXtreme-Fusion 5 :: Demo :: CZ" src="http://localhost/extreme/demo/templates/images/ef_demo/cz.png" style="width: 66px; height: 83px; float: left;" /></div>\r\n<div style="text-align: center;">\r\n	<em><img alt="eXtreme-Fusion 5 :: DEMO : CZ" src="http://localhost/extreme/demo/templates/images/ef_demo/cz.png" style="width: 66px; height: 83px; float: right;" /></em></div>\r\n<div>\r\n	<div>\r\n		&nbsp;</div>\r\n	<div style="text-align: center;">\r\n		<em>Ještě nemáte <a href="http://extreme-fusion.org">eXtreme-Fusion 5: Ninja Edition</a>?&nbsp;</em><br />\r\n		<em>Chcete se s ním seznámit ještě dřív než ho stáhnete?</em><br />\r\n		<em>Připravili jsme speciální demo verzi eXtreme-Fusion 5!</em></div>\r\n	<div style="text-align: center;">\r\n		&nbsp;</div>\r\n	<div style="text-align: center;">\r\n		&nbsp;</div>\r\n	<div>\r\n		<span style="color:#ffa500;"><strong>Dáváme Vám možnost vyzkoušet si většinu funkcí systému!</strong></span><br />\r\n		Psaní novinek, přidávání účtů přes Admin Panel, spravování skupin oprávnění, nastavení či panelů systému, přidávání nových stránek a&nbsp;instalování nových modulů s možností jejich řízení.</div>\r\n	<div>\r\n		&nbsp;</div>\r\n	<div>\r\n		<strong><span style="color:#ffa500;">Chcete vidět jak to všechno vypadá? Seznamte se systémem ještě dnes!</span></strong><br />\r\n		Jediné, co musíte udělat, je přihlásit se pomocí následujících uživatelských údajů:</div>\r\n	<div>\r\n		&nbsp;</div>\r\n	<div style="text-align: center;">\r\n		<strong><span style="color:#ffa500;">Název uživatele:</span> Admin</strong><br />\r\n		<strong><span style="color:#ffa500;">Heslo:</span> administrator5</strong></div>\r\n</div>\r\n';
+	$news = '<div style="text-align: center;">\r\n  <img alt="eXtreme-Fusion 5 :: Demo :: EN" src="'.ADDR_SITE.'templates/images/ef_demo/gb.png" style="width: 66px; height: 83px; float: left;" /></div>\r\n<div style="text-align: center;">\r\n  <em><img alt="eXtreme-Fusion 5 :: DEMO : EN" src="'.ADDR_SITE.'templates/images/ef_demo/gb.png" style="width: 66px; height: 83px; float: right;" /></em></div>\r\n<div>\r\n  &nbsp;</div>\r\n<div style="text-align: center;">\r\n  <em>You don&#39;t have <a href="http://extreme-fusion.org">eXtreme-Fusion 5: Ninja Edition</a>?</em><br />\r\n  <em>Do you want to get familiar with it before you download it?&nbsp;</em><br />\r\n  <em>We have prepared special demo version of eXtreme-Fusion 5!</em></div>\r\n<div style="text-align: center;">\r\n  &nbsp;</div>\r\n<div style="text-align: center;">\r\n  &nbsp;</div>\r\n<div>\r\n  <span style="color:#ffa500;"><strong>We are giving you a&nbsp;possibility to test the most of system functions!</strong></span><br />\r\n  News writing, adding accounts from Admin Panel, managing of groups permissions, settings, panel system, adding new pages and installing new modules with ability to manage them.</div>\r\n<div>\r\n  &nbsp;</div>\r\n<div>\r\n  <strong><span style="color:#ffa500;">Do you want to see how it looks? Get familiar with system today!</span></strong><br />\r\n  Only thing to do is login using following user data:</div>\r\n<div>\r\n  &nbsp;</div>\r\n<div style="text-align: center;">\r\n  <strong><span style="color:#ffa500;">Username:</span> admin</strong><br />\r\n  <strong><span style="color:#ffa500;">Password:</span> administrator5</strong></div>\r\n<div style="text-align: center;">\r\n  &nbsp;</div>\r\n<div style="text-align: center;">\r\n  &nbsp;</div>\r\n<hr />\r\n<div style="text-align: center;">\r\n  <img alt="eXtreme-Fusion 5 :: Demo :: PL" src="'.ADDR_SITE.'templates/images/ef_demo/pl.png" style="width: 66px; height: 83px; float: left;" /></div>\r\n<div style="text-align: center;">\r\n  <em><img alt="eXtreme-Fusion 5 :: DEMO : PL" src="'.ADDR_SITE.'templates/images/ef_demo/pl.png" style="width: 66px; height: 83px; float: right;" /></em></div>\r\n<div>\r\n  <div>\r\n    &nbsp;</div>\r\n  <div style="text-align: center;">\r\n    <em>Nie posiadasz jeszcze <a href="http://extreme-fusion.org">eXtreme-Fusion 5: Ninja Edition</a>?&nbsp;</em><br />\r\n    <em>Przed pobraniem chcesz zapoznać się z&nbsp;systemem?</em><br />\r\n    <em>Przygotowaliśmy dla Ciebie wersję demonstracyjną eXtreme-Fusion 5!</em></div>\r\n  <div style="text-align: center;">\r\n    &nbsp;</div>\r\n  <div style="text-align: center;">\r\n    &nbsp;</div>\r\n  <div>\r\n    <span style="color:#ffa500;"><strong>Dajemy Ci praktycznie wszystkie możliwości sprawdzenia systemu!</strong></span><br />\r\n    Pisanie news&oacute;w, dodawanie kont z&nbsp;poziomu administratora, zarządzanie grupami uprawnień, ustawieniami, układem paneli, dodawanie stron treści oraz instalowanie systemowych moduł&oacute;w i&nbsp;zabawa nimi.</div>\r\n  <div>\r\n    &nbsp;</div>\r\n  <div>\r\n    <strong><span style="color:#ffa500;">Chesz zobaczyć jak to wygląda? Zapoznaj się z&nbsp;systemem już dziś!&nbsp;</span></strong><br />\r\n    Wystarczy tylko, że się zalogujesz korzystając z&nbsp;poniższych danych:</div>\r\n  <div>\r\n    &nbsp;</div>\r\n  <div style="text-align: center;">\r\n    <strong><span style="color:#ffa500;">Nazwa użytkownika:</span> admin</strong><br />\r\n    <strong><span style="color:#ffa500;">Hasło:</span> administrator5</strong></div>\r\n</div>\r\n<div style="text-align: center;">\r\n  &nbsp;</div>\r\n<div style="text-align: center;">\r\n  &nbsp;</div>\r\n<hr />\r\n<div style="text-align: center;">\r\n  <img alt="eXtreme-Fusion 5 :: Demo :: CZ" src="'.ADDR_SITE.'templates/images/ef_demo/cz.png" style="width: 66px; height: 83px; float: left;" /></div>\r\n<div style="text-align: center;">\r\n  <em><img alt="eXtreme-Fusion 5 :: DEMO : CZ" src="'.ADDR_SITE.'templates/images/ef_demo/cz.png" style="width: 66px; height: 83px; float: right;" /></em></div>\r\n<div>\r\n  <div>\r\n    &nbsp;</div>\r\n  <div style="text-align: center;">\r\n    <em>Ještě nemáte <a href="http://extreme-fusion.org">eXtreme-Fusion 5: Ninja Edition</a>?&nbsp;</em><br />\r\n    <em>Chcete se s ním seznámit ještě dřív než ho stáhnete?</em><br />\r\n    <em>Připravili jsme speciální demo verzi eXtreme-Fusion 5!</em></div>\r\n  <div style="text-align: center;">\r\n    &nbsp;</div>\r\n  <div style="text-align: center;">\r\n    &nbsp;</div>\r\n  <div>\r\n    <span style="color:#ffa500;"><strong>Dáváme Vám možnost vyzkoušet si většinu funkcí systému!</strong></span><br />\r\n    Psaní novinek, přidávání účtů přes Admin Panel, spravování skupin oprávnění, nastavení či panelů systému, přidávání nových stránek a&nbsp;instalování nových modulů s možností jejich řízení.</div>\r\n  <div>\r\n    &nbsp;</div>\r\n  <div>\r\n    <strong><span style="color:#ffa500;">Chcete vidět jak to všechno vypadá? Seznamte se systémem ještě dnes!</span></strong><br />\r\n    Jediné, co musíte udělat, je přihlásit se pomocí následujících uživatelských údajů:</div>\r\n  <div>\r\n    &nbsp;</div>\r\n  <div style="text-align: center;">\r\n    <strong><span style="color:#ffa500;">Název uživatele:</span> admin</strong><br />\r\n    <strong><span style="color:#ffa500;">Heslo:</span> administrator5</strong></div>\r\n</div>\r\n';
 	
 	$query = $_pdo->exec("INSERT INTO [news] (`id`, `title`, `link`, `category`, `language`, `content`, `content_extended`, `author`, `source`, `description`, `breaks`, `datestamp`, `access`, `reads`, `draft`, `sticky`, `allow_comments`, `allow_ratings`) VALUES
 		(1, 'eXtreme-Fusion 5 :: Demo', 'extreme-fusion_5_demo', 3, 'Polish', '".$news."', '', 1, 'http://extreme-fusion.org', 'EN: This site is a demonstration of Content Management System (CMS) - eXtreme-Fusion 5: Ninja Edition.\r\n\r\nPL: Ta strona jest demonstracją Systemu Zarządzania Treścią (CMS) - eXtreme-Fusion 5: Ninja Edition', '0', 1369995541, '3', 1, 0, 1, 1, 0);");
@@ -641,7 +630,7 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		('site_banner1', ''),
 		('site_banner2', ''),
 		('site_intro', '<div style=\"text-align:center\">EN: Welcome to the website with demo version of eXtreme-Fusion 5: Ninja Edition</div>\r\n<div style=\"text-align:center\">PL: Witaj na stronie z wersją demo eXtreme-Fusion 5: Ninja Edition</div>\r\n<div style=\"text-align:center\">CZ: Vítejte na stránkách s demoverzí eXtreme-Fusion 5: Ninja Edition</div>'),
-		('site_name', 'DEMO:: eXtreme-Fusion 5 - Ninja Edition'),
+		('site_name', 'eXtreme-Fusion ".VERSION." - Ninja Edition'),
 		('site_username', 'Admin'),
 		('smtp_host', ''),
 		('smtp_password', ''),
@@ -653,7 +642,7 @@ require_once DIR_SYSTEM.'helpers/main.php';
 		('userthemes', '1'),
 		('user_custom_offset_timezone', '0'),
 		('validation', 'a:1:{s:8:\"register\";s:1:\"0\";}'),
-		('version', '5.0.4-unstable-demo'),
+		('version', '".VERSION."'),
 		('visits_counter_enabled', '1');
 	");
 	
