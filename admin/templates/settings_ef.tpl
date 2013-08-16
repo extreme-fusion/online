@@ -16,13 +16,13 @@
 |
 **********************************************************
                 ORIGINALLY BASED ON
----------------------------------------------------------+
+---------------------------------------------------------
 | PHP-Fusion Content Management System
 | Copyright (C) 2002 - 2011 Nick Jones
 | http://www.php-fusion.co.uk/
-+--------------------------------------------------------+
++------------------------------------------------------
 | Author: Nick Jones (Digitanium)
-+--------------------------------------------------------+
++------------------------------------------------------
 | This program is released as free software under the
 | Affero GPL license. You can redistribute it and/or
 | modify it under the terms of this license which you
@@ -30,12 +30,12 @@
 | at www.gnu.org/licenses/agpl.html. Removal of this
 | copyright header is strictly prohibited without
 | written permission from the original author(s).
-+--------------------------------------------------------*/
++------------------------------------------------------*/
 *}
 
 {if $message}<div class="{$class}">{$message}</div>{/if}
 <form action="{$URL_REQUEST}" method="post" id="This">
-	<h3>{i18n('Logging and Cookies')}</h3>
+	<h3>{i18n('Cookies')}</h3>
 	<div class="tbl2">
 		<div class="grid_6 formLabel"><label for="CookieDomain">{i18n('Domain cookies:')}</label><small>{i18n('www domain')}</small></div>
 		<div class="grid_4 formField"><input type="text" name="cookie_domain" value="{$cookie_domain}" id="CookieDomain" class="num_100" maxlength="100" /></div>

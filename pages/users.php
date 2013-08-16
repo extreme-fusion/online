@@ -36,7 +36,7 @@ $_locale->load('users');
 define('THIS', FALSE);
 
 $theme = array(
-	'Title' => __('Lista użytkowników').' &raquo; '.$_sett->get('site_name'),
+	'Title' => __('Lista użytkowników').' » '.$_sett->get('site_name'),
 	'Keys' => 'Użytkownicy '.$_sett->get('site_name').', konta '.$_sett->get('site_name').', profile',
 	'Desc' => 'Lista aktywnych kont na stronie '.$_sett->get('site_name')
 );
@@ -82,7 +82,7 @@ if ($rows)
 				$cache[] = array(
 					'row' => $i % 2 == 0 ? 'tbl1' : 'tbl2',
 					'id' => $row['id'],
-					'visit' => ($row['lastvisit'] != 0 ? HELP::showDate('shortdate', $row['lastvisit']) : __('Nie był na stronie')),
+					'visit' => ($row['lastvisit'] != 0 ? HELP::showDate('shortdate', $row['lastvisit']) : __('Never logged in')),
 					'link' => HELP::profileLink($row['username'], $row['id']),
 					'role' => $_user->getRoleName($row['role']),
 					'roles' => implode(', ', $_user->getUserRolesTitle($row['id'], 3))

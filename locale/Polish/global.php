@@ -22,8 +22,12 @@
  This program is released as free software under the
  Affero GPL license.*/
 
-/** TODO: Konfiguracja języka w osobnym pliku (`locale.php`) ***/
-setlocale(LC_TIME, array('pl_PL.UTF-8', 'Polish'));
+/**
+ * Nie ładujemy locali UTF-8, gdyż jest problem z rozpoznaniem kodowania.
+ * Funkcja mb_detect_encoding nie działa prawidłowo,
+ * a konwertowanie ciągu UTF-8 do UTF-8 może powodować stratę znaków.
+ */
+setlocale(LC_TIME, array('pl_PL', 'pl', 'Polish_Poland.28592'));
 
 return array(
 
@@ -46,6 +50,7 @@ return array(
 	'Author' => 'Autor',
 	'Title:' => 'Tytuł:',
 	'Content' => 'Treść',
+	'Subject:' => 'Temat:',
 	// userException class
 	'Entered the wrong data type.' => 'Wprowadzono dane o niepoprawnym typie',
 
@@ -73,6 +78,7 @@ return array(
 	'Hide e-mail:' => 'Ukryć e-mail:',
 	'Remember me' => 'Pamiętaj logowanie',
 	'Settings' => 'Ustawienia',
+	'E-mail address' => 'Adres e-mail',
 
 	'Register' => 'Rejestracja',
 	'Forgot password' => 'Odzyskiwanie hasła',
@@ -94,6 +100,9 @@ return array(
 
 	'User Panel' => 'Panel użytkownika',
 	'Admin Panel' => 'Administracja',
+
+	'--No selection--' => '--Brak wyboru--',
+	'--Default--' => '--Domyślne--',
 
 	'Private messages' => 'Prywatne wiadomości',
 
@@ -220,7 +229,6 @@ return array(
 	'global_159' => 'Wpisz kod potwierdzający:',
 	// Footer Counter
 	'global_170' => 'unikalna wizyta',
-	'global_171' => 'unikalnych wizyt',
 	'global_172' => 'Wygenerowano w&nbsp;sekund: %s',
 	'global_173' => 'zapytań MySQL',
 	// Admin Navigation
@@ -339,11 +347,16 @@ return array(
 	'Edit account' => 'Edytuj konto',
 	'Language:' => 'Język:',
 
+	'Never logged in' => 'Nie był na stronie',
+
 	'Polish' => 'Polski',
 	'English' => 'Angielski',
 	'Czech' => 'Czeski',
 
 	'Modules under Development.' => 'Moduł w trakcie rozwoju.',
+
+	// Footer
+	'Unique visits:' => 'Unikalnych wizyt:',
 
 	// Error exceptions
 
@@ -360,10 +373,20 @@ return array(
 
 	//System
 	'System error' => 'Błąd systemu',
+	'Internal error' => 'Błąd wewnętrzny',
 	'Error path' => 'Ścieżka błędu',
 	'In file' => 'W pliku',
-	'Function' => 'Funckja',
+	'Function' => 'Funkcja',
 	'Line' => 'Linia',
+	'Directories' => 'Katalogi',
+	'Directory' => 'Katalog',
+	'Path' => 'Ścieżka',
+	'Status' => 'Status',
+	'Exist' => 'Istnieje',
+	'Does not exist' => 'Nie istnieje',
+	'File' => 'Plik',
+	'Method' => 'Metoda',
+	'Templates' => 'Templateka',
 
 	// Arguments
 	'Function argument error' => 'Błąd argumentów funkcji',
@@ -372,6 +395,7 @@ return array(
 	//User
 	'User error' => 'Błąd użytkownika',
 	'PDO Error' => 'Błąd interpretera PDO',
+	'PDO Queries' => 'Zapytanie PDO',
 
 	//Comments
 	'Add comments' => 'Skomentuj',
@@ -381,6 +405,9 @@ return array(
 	'Adding your comment' => 'Dodawanie komentarza',
 	'Comment has been added' => 'Komentarz został dodany',
 	'Commenting has been disabled for your group permissions' => 'Komentowanie zostało wyłączone dla twojej grupy uprawnień',
+	'Error: Not entered the content of comments' => 'Błąd: nie podano treści komentarza',
+	'Update comments' => 'Edytuj komentarz',
+	'Delete comments' => 'Usuń komentarz',
 
 	//News Categories
 	'Bugs' => 'Błędy',

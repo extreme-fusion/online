@@ -16,13 +16,13 @@
 |
 **********************************************************
                 ORIGINALLY BASED ON
----------------------------------------------------------+
+---------------------------------------------------------
 | PHP-Fusion Content Management System
 | Copyright (C) 2002 - 2011 Nick Jones
 | http://www.php-fusion.co.uk/
-+--------------------------------------------------------+
++-------------------------------------------------------
 | Author: Nick Jones (Digitanium)
-+--------------------------------------------------------+
++-------------------------------------------------------
 | This program is released as free software under the
 | Affero GPL license. You can redistribute it and/or
 | modify it under the terms of this license which you
@@ -30,12 +30,12 @@
 | at www.gnu.org/licenses/agpl.html. Removal of this
 | copyright header is strictly prohibited without
 | written permission from the original author(s).
-+--------------------------------------------------------*/
++-------------------------------------------------------*/
 *}
 
 {if $page == 'category'}
 	{* Do przerobienia *}
-	{php} opentable(__('News categories').' &raquo; '.$this->data['category']['cat_name']) {/php}
+	{php} $this->middlePanel(__('News categories').' &raquo; '.$this->data['category']['cat_name']); {/php}
 		<p class="cat_top dark text_dark">
 			<a href="{$all_news_url}">{i18n('News')}</a> <img src="{$THEME_IMAGES}bullet.png" alt=""> <a href="{$all_news_cats_url}">{i18n('News categories')}</a> <img src="{$THEME_IMAGES}bullet.png" alt=""> <strong>{i18n($category.cat_name)}</strong> ({$category.cat_news_count})
 		</p>
@@ -60,7 +60,7 @@
 		{else}
 			<p class="status">{i18n('There are no news in the specified category.')}</p>
 		{/if}
-	{php} closetable() {/php}
+	{php} $this->middlePanel() {/php}
 {elseif $page == 'overview'}
 	{panel=i18n('News categories')}
 		<p class="cat_top dark text_dark">

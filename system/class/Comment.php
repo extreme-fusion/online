@@ -52,8 +52,10 @@ class Comment extends Observer
 		$this->_sett = $_sett;
 		$this->_sbb = $_sbb;
 
+		$this->_tpl->setCompilePrefix('site_');
 		$this->_tpl->root = DIR_TEMPLATES.'pre'.DS;
 		$this->_tpl->compile = DIR_CACHE;
+		//$this->_tpl->compile = DIR_CACHE.'compile'.DS; 
 		parent::$_obj = $_tpl;
 	}
 
@@ -175,7 +177,7 @@ class Comment extends Observer
 		;
 	}
 
-	// ID komentarza do usuniêcia
+	// ID komentarza do usuniÄ™cia
 	public function delete($id)
 	{
 		if (isNum($id))
@@ -186,7 +188,7 @@ class Comment extends Observer
 		throw new systemException('Wrong type of `$id` parameter');
 	}
 
-	// Iloœæ dni, przez które komentarze moga znajdowaæ siê w bazie
+	// IloÅ›Ä‡ dni, przez ktÃ³re komentarze moga znajdowaÄ‡ siÄ™ w bazie
 	public function deleteAll($time = NULL)
 	{
 		if ($time === NULL)
@@ -208,7 +210,7 @@ class Comment extends Observer
 		return $count;
 	}
 
-	// ID komentarza, treœæ, czas zapisu, autor (nick)
+	// ID komentarza, treÅ›Ä‡, czas zapisu, autor (nick)
 	public function update($id, $content, $time = NULL, $author = NULL)
 	{
 		if (isNum($id))
@@ -311,9 +313,9 @@ class Comment extends Observer
 		return $this->_user->hasPermission('site.comment.add');
 	}
 
-	// Dodaje do bazy komentarz uprzednio sprawdzaj¹c, czy uzytkownik ma prawo do zamieszczania komentarzy
-	// Dane wejœciowe nie s¹ przefiltrowane
-	// Metoda przeznaczona do ¿¹dañ AJAX - nie rzuca wyj¹tkami, a jedynie zwraca wartoœæ
+	// Dodaje do bazy komentarz uprzednio sprawdzajÄ…c, czy uzytkownik ma prawo do zamieszczania komentarzy
+	// Dane wejÅ›ciowe nie sÄ… przefiltrowane
+	// Metoda przeznaczona do Å¼Ä…daÅ„ AJAX - nie rzuca wyjÄ…tkami, a jedynie zwraca wartoÅ›Ä‡
 	public function addComment($post, $content_type, $content_id, $author = NULL)
 	{
 		if ($this->_user->hasPermission('site.comment.add'))

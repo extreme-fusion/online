@@ -71,16 +71,16 @@ if ($_route->getAction() === NULL)
 	$query = $_pdo->getData('SELECT k.to, k.from, (SELECT mm.subject FROM [messages] AS mm WHERE mm.item_id = k.item_id ORDER BY mm.id ASC LIMIT 1) AS subject, k.datestamp, k.item_id, k.read FROM [messages] AS k WHERE (k.to = :user OR k.from = :user) AND k.id IN (SELECT max(b.id) FROM [messages] AS b GROUP BY b.item_id) ORDER BY k.id DESC',
 		array(':user', $_user->get('id'), PDO::PARAM_INT)
 	);
-
+	
+	$theme = array(
+		'Title' => __('Private messaging inbox » :sitename', array(':sitename' => $_sett->get('site_name'))),
+		'Keys' => __('private messaging, communication, chat'),
+		'Desc' => __('You can easily communicate with users')
+	);
+	
 	if($query)
 	{
-		$theme = array(
-			'Title' => __('Skrzynka odbiorcza Prywatnych Wiadomości'),
-			'Keys' => 'prywatne wiadomości, komunikacja, chat',
-			'Desc' => 'W łatwy sposób możesz komunikować się z użytkownikami.'
-		);
-
-		$i = 0;
+		$i = 0; $bookmarks['inbox'] = FALSE; $bookmarks['outbox'] = FALSE; $bookmarks['draft'] = FALSE;
 		foreach($query as $row)
 		{
 			$userid = $row['to'] == $_user->get('id') ? $row['from'] : $row['to'];
@@ -99,6 +99,7 @@ if ($_route->getAction() === NULL)
 			// Czy wiadomość wysłao do mnie?
 			if ($row['to'] === $_user->get('id'))
 			{
+				$bookmarks['inbox'] = TRUE;
 				if ($row['read'] === '0')
 				{
 					// Jeszcze nie została przeczytana.
@@ -112,6 +113,7 @@ if ($_route->getAction() === NULL)
 			}
 			else
 			{
+				$bookmarks['outbox'] = TRUE;
 				if ($row['read'] === '0')
 				{
 					// Jeszcze nie została przeczytana przez odbiorcę.
@@ -128,11 +130,11 @@ if ($_route->getAction() === NULL)
 		}
 
 		$_tpl->assign('data', $data);
+		
+		$_tpl->assign('has_messages', array('inbox' => $bookmarks['inbox'], 'outbox' => $bookmarks['outbox'], 'draft' => $bookmarks['draft']));
 	}
 	
-	// Sprawdzanie, czy są jakieś wiadomości w kategoriach "odebrane", "wysłane", "robocze" - do zrobienia :)
-	$_tpl->assign('has_messages', array('inbox' => TRUE, 'outbox' => TRUE, 'draft' => TRUE));
-
+	
 	// Link do "Nowej wiadomości"
 	$_tpl->assign('url_new_message', $_route->path(array('controller' => 'messages', 'action' => 'new')));
 }
@@ -148,9 +150,9 @@ elseif ($_route->getAction() === 'view')
 		$recipient = $_user->getByID($_route->getParamVoid(1), 'username');
 
 		$theme = array(
-			'Title' => __('Wyślij wiadomość do: ').$recipient.' &raquo; '.$_sett->get('site_name'),
-			'Keys' => 'prywatne wiadomości, komunikacja, chat z '.$recipient,
-			'Desc' => 'W łatwy sposób możesz komunikować się z '.$recipient.'.'
+			'Title' => __('Send message to: :recipient » :sitename', array(':recipient' => $recipient, ':sitename' => $_sett->get('site_name'))),
+			'Keys' => __('private message with :recipient, communication with :recipient, chat with :recipient',  array(':recipient' => $recipient)),
+			'Desc' => __('You can easily communicate with user :recipient',  array(':recipient' => $recipient)),
 		);
 
 		/**
@@ -200,9 +202,9 @@ elseif ($_route->getAction() === 'new')
 		$_tpl->assign('section', 'new-by-search');
 
 		$theme = array(
-			'Title' => __('Nowa wiadomość'),
-			'Keys' => 'prywatne wiadomości, komunikacja, chat',
-			'Desc' => 'W łatwy sposób możesz komunikować się z użytkownikami strony.'
+			'Title' => __('New message » :sitename', array(':sitename' => $_sett->get('site_name'))),
+			'Keys' => __('private messaging, communication, chat'),
+			'Desc' => __('You can easily communicate with users')
 		);
 	}
 }
